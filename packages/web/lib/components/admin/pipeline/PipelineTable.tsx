@@ -58,7 +58,7 @@ function formatRelativeTime(isoString: string): string {
   const diffHours = Math.floor(diffMinutes / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  if (diffMinutes < 1) return "Just now";
+  if (diffMinutes < 1) return "방금 전";
   if (diffMinutes < 60) return `${diffMinutes}m ago`;
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays < 7) return `${diffDays}d ago`;
@@ -85,9 +85,9 @@ export function PipelineTable({
 }: PipelineTableProps) {
   if (data.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
-        <div className="flex items-center justify-center py-16 text-sm text-gray-500 dark:text-gray-400">
-          No pipelines found
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="flex items-center justify-center py-16 text-sm text-muted-foreground">
+          파이프라인이 없습니다
         </div>
       </div>
     );
@@ -102,7 +102,7 @@ export function PipelineTable({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+    <div className="bg-card border border-border rounded-xl overflow-hidden">
       <table className="w-full table-fixed">
         <colgroup>
           <col className="w-16" />
@@ -114,27 +114,27 @@ export function PipelineTable({
           <col className="w-20" />
         </colgroup>
         <thead>
-          <tr className="border-b border-gray-100 dark:border-gray-800">
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Image
+          <tr className="border-b border-border">
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              이미지
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Post ID
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              게시물 ID
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Status
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              상태
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Duration
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              소요 시간
             </th>
-            <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Triggered By
+            <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              실행자
             </th>
-            <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Started At
+            <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              시작 시각
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Actions
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              액션
             </th>
           </tr>
         </thead>
@@ -150,10 +150,10 @@ export function PipelineTable({
                   onClick={() => onSelectPipeline(pipeline.id)}
                   aria-expanded={isExpanded}
                   className={[
-                    "cursor-pointer transition-colors border-b border-gray-100 dark:border-gray-800",
+                    "cursor-pointer transition-colors border-b border-border",
                     isExpanded
-                      ? "bg-gray-50 dark:bg-gray-800/50"
-                      : "hover:bg-gray-50 dark:hover:bg-gray-800/50",
+                      ? "bg-accent/30"
+                      : "hover:bg-accent/30",
                   ].join(" ")}
                 >
                   {/* Thumbnail */}
@@ -172,7 +172,7 @@ export function PipelineTable({
                   {/* Post ID */}
                   <td className="px-4 py-3">
                     <span
-                      className="text-sm text-gray-700 dark:text-gray-300 font-mono truncate block"
+                      className="text-sm text-foreground font-mono truncate block"
                       title={pipeline.postId}
                     >
                       {pipeline.postId}
@@ -185,17 +185,17 @@ export function PipelineTable({
                   </td>
 
                   {/* Duration */}
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 tabular-nums">
+                  <td className="px-4 py-3 text-sm text-foreground tabular-nums">
                     {formatDuration(pipeline.totalDurationMs)}
                   </td>
 
                   {/* Triggered By (hidden on mobile) */}
-                  <td className="hidden sm:table-cell px-4 py-3 text-sm text-gray-700 dark:text-gray-300 truncate">
+                  <td className="hidden sm:table-cell px-4 py-3 text-sm text-foreground truncate">
                     {pipeline.triggerUser}
                   </td>
 
                   {/* Started At (hidden on mobile) */}
-                  <td className="hidden sm:table-cell px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                  <td className="hidden sm:table-cell px-4 py-3 text-sm text-muted-foreground">
                     {formatRelativeTime(pipeline.startedAt)}
                   </td>
 
@@ -205,9 +205,9 @@ export function PipelineTable({
                       <button
                         type="button"
                         onClick={(e) => handleRetry(e, pipeline.id)}
-                        className="px-2.5 py-1 text-xs font-medium rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                        className="px-2.5 py-1 text-xs font-medium rounded-md bg-muted text-foreground hover:bg-accent transition-colors"
                       >
-                        Retry
+                        재시도
                       </button>
                     )}
                   </td>
@@ -218,7 +218,7 @@ export function PipelineTable({
                   <tr key={`${pipeline.id}-detail`}>
                     <td
                       colSpan={7}
-                      className="p-0 border-b border-gray-100 dark:border-gray-800"
+                      className="p-0 border-b border-border"
                     >
                       <PipelineDetail pipelineId={pipeline.id} />
                     </td>
@@ -240,7 +240,7 @@ export function PipelineTable({
  */
 export function PipelineTableSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden animate-pulse">
+    <div className="bg-card border border-border rounded-xl overflow-hidden animate-pulse">
       <table className="w-full table-fixed">
         <colgroup>
           <col className="w-16" />
@@ -252,13 +252,13 @@ export function PipelineTableSkeleton() {
           <col className="w-20" />
         </colgroup>
         <thead>
-          <tr className="border-b border-gray-100 dark:border-gray-800">
-            {["Image", "Post ID", "Status", "Duration", "Triggered By", "Started At", "Actions"].map(
+          <tr className="border-b border-border">
+            {["이미지", "게시물 ID", "상태", "소요 시간", "실행자", "시작 시각", "액션"].map(
               (label, i) => (
                 <th
                   key={label}
                   className={[
-                    "px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
+                    "px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider",
                     i >= 4 ? "hidden sm:table-cell" : "",
                   ].join(" ")}
                 >
@@ -272,35 +272,35 @@ export function PipelineTableSkeleton() {
           {Array.from({ length: 5 }).map((_, i) => (
             <tr
               key={i}
-              className="border-b border-gray-100 dark:border-gray-800 last:border-0"
+              className="border-b border-border last:border-0"
             >
               {/* Thumbnail shimmer */}
               <td className="px-4 py-3">
-                <div className="w-10 h-[30px] rounded bg-gray-200 dark:bg-gray-700" />
+                <div className="w-10 h-[30px] rounded bg-muted" />
               </td>
               {/* Post ID shimmer */}
               <td className="px-4 py-3">
-                <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700" />
+                <div className="h-4 w-24 rounded bg-muted" />
               </td>
               {/* Status shimmer */}
               <td className="px-4 py-3">
-                <div className="h-5 w-20 rounded-full bg-gray-200 dark:bg-gray-700" />
+                <div className="h-5 w-20 rounded-full bg-muted" />
               </td>
               {/* Duration shimmer */}
               <td className="px-4 py-3">
-                <div className="h-4 w-12 rounded bg-gray-200 dark:bg-gray-700" />
+                <div className="h-4 w-12 rounded bg-muted" />
               </td>
               {/* Triggered By shimmer (hidden on mobile) */}
               <td className="hidden sm:table-cell px-4 py-3">
-                <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700" />
+                <div className="h-4 w-24 rounded bg-muted" />
               </td>
               {/* Started At shimmer (hidden on mobile) */}
               <td className="hidden sm:table-cell px-4 py-3">
-                <div className="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700" />
+                <div className="h-4 w-20 rounded bg-muted" />
               </td>
               {/* Actions shimmer */}
               <td className="px-4 py-3">
-                <div className="h-6 w-12 rounded bg-gray-200 dark:bg-gray-700" />
+                <div className="h-6 w-12 rounded bg-muted" />
               </td>
             </tr>
           ))}

@@ -119,6 +119,7 @@ const config: Config = {
       animation: {
         "pulse-soft": "pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "spot-reveal": "spot-reveal 0.4s ease-out forwards",
+        "fade-in-out": "fade-in-out 2s ease-in-out infinite",
       },
       keyframes: {
         "pulse-soft": {
@@ -144,6 +145,10 @@ const config: Config = {
             opacity: "1",
             transform: "translate(-50%, -50%) scale(1)",
           },
+        },
+        "fade-in-out": {
+          "0%, 100%": { opacity: "0.5" },
+          "50%": { opacity: "1" },
         },
       },
     },

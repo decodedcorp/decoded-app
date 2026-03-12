@@ -32,29 +32,29 @@ function StepIcon({ status }: { status: StepStatus }) {
       return (
         <CheckCircle
           className="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0"
-          aria-label="Completed"
+          aria-label="완료"
         />
       );
     case "running":
       return (
         <Loader
           className="w-5 h-5 text-blue-500 dark:text-blue-400 shrink-0 animate-spin"
-          aria-label="Running"
+          aria-label="실행 중"
         />
       );
     case "failed":
       return (
         <XCircle
           className="w-5 h-5 text-red-500 dark:text-red-400 shrink-0"
-          aria-label="Failed"
+          aria-label="실패"
         />
       );
     case "pending":
     default:
       return (
         <Circle
-          className="w-5 h-5 text-gray-300 dark:text-gray-600 shrink-0"
-          aria-label="Pending"
+          className="w-5 h-5 text-muted-foreground shrink-0"
+          aria-label="대기 중"
         />
       );
   }
@@ -63,9 +63,9 @@ function StepIcon({ status }: { status: StepStatus }) {
 // ─── Step display names ───────────────────────────────────────────────────────
 
 const STEP_DISPLAY_NAMES: Record<string, string> = {
-  upload: "Upload",
-  analyze: "Analyze",
-  detect: "Detect",
+  upload: "업로드",
+  analyze: "분석",
+  detect: "감지",
 };
 
 // ─── Step row ─────────────────────────────────────────────────────────────────
@@ -85,7 +85,7 @@ function StepRow({
       {/* Vertical timeline connector line */}
       {!isLast && (
         <div
-          className="absolute left-[9px] top-6 w-px bg-gray-200 dark:bg-gray-700"
+          className="absolute left-[9px] top-6 w-px bg-border"
           style={{ bottom: "-12px" }}
           aria-hidden="true"
         />
@@ -103,8 +103,8 @@ function StepRow({
             className={[
               "text-sm font-medium",
               isPending
-                ? "text-gray-400 dark:text-gray-600"
-                : "text-gray-900 dark:text-gray-100",
+                ? "text-muted-foreground"
+                : "text-foreground",
             ].join(" ")}
           >
             {STEP_DISPLAY_NAMES[step.name] ?? step.name}
@@ -113,8 +113,8 @@ function StepRow({
             className={[
               "text-xs tabular-nums shrink-0",
               isPending
-                ? "text-gray-300 dark:text-gray-700"
-                : "text-gray-500 dark:text-gray-400",
+                ? "text-muted-foreground/70"
+                : "text-muted-foreground",
             ].join(" ")}
           >
             {formatDuration(step.durationMs)}
@@ -123,16 +123,16 @@ function StepRow({
 
         {/* Timestamps (skip for pending/running without completedAt) */}
         {!isPending && (
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            {step.startedAt ? `Started: ${formatTime(step.startedAt)}` : ""}
-            {step.completedAt ? ` · Done: ${formatTime(step.completedAt)}` : ""}
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {step.startedAt ? `시작: ${formatTime(step.startedAt)}` : ""}
+            {step.completedAt ? ` · 완료: ${formatTime(step.completedAt)}` : ""}
           </p>
         )}
 
         {/* Error box for failed steps */}
         {isFailed && step.error && (
-          <div className="mt-2 px-3 py-2 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-            <p className="text-xs text-red-700 dark:text-red-400 font-mono break-words">
+          <div className="mt-2 px-3 py-2 rounded-md bg-destructive/10 border border-destructive/30">
+            <p className="text-xs text-destructive font-mono break-words">
               {step.error}
             </p>
           </div>
@@ -160,23 +160,23 @@ export function PipelineDetail({ pipelineId }: PipelineDetailProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-6">
-        <Loader className="w-5 h-5 animate-spin text-gray-400 dark:text-gray-600" />
+        <Loader className="w-5 h-5 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="py-4 text-sm text-gray-400 dark:text-gray-500 text-center">
-        Pipeline details not available.
+      <div className="py-4 text-sm text-muted-foreground text-center">
+        파이프라인 상세 정보를 불러올 수 없습니다.
       </div>
     );
   }
 
   return (
-    <div className="px-4 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800">
-      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
-        Execution Steps
+    <div className="px-4 py-4 bg-muted/30 border-t border-border">
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-4">
+        실행 단계
       </p>
 
       <div>

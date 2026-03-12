@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -12,6 +13,19 @@ import {
 } from "recharts";
 import type { DailyMetric } from "@/lib/api/admin/dashboard";
 
+/** Reads chart colors from CSS variables (chart-1..5) for Recharts compatibility */
+function useChartColors(): [string, string, string] {
+  return useMemo(() => {
+    if (typeof document === "undefined")
+      return ["oklch(0.9519 0.1739 115.8446)", "oklch(0.7058 0 0)", "oklch(0.7049 0.1867 47.6044)"];
+    const s = getComputedStyle(document.documentElement);
+    const c1 = s.getPropertyValue("--chart-1").trim() || "oklch(0.9519 0.1739 115.8446)";
+    const c2 = s.getPropertyValue("--chart-2").trim() || "oklch(0.7058 0 0)";
+    const c3 = s.getPropertyValue("--chart-3").trim() || "oklch(0.7049 0.1867 47.6044)";
+    return [c1, c2, c3];
+  }, []);
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface TrafficChartProps {
@@ -23,9 +37,9 @@ interface TrafficChartProps {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PERIODS = [
-  { label: "7D", value: 7 },
-  { label: "14D", value: 14 },
-  { label: "30D", value: 30 },
+  { label: "7일", value: 7 },
+  { label: "14일", value: 14 },
+  { label: "30일", value: 30 },
 ];
 
 /** Formats ISO date string "YYYY-MM-DD" to short "Feb 1" style */
@@ -63,8 +77,8 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload || payload.length === 0) return null;
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3 text-xs">
-      <p className="font-medium text-gray-700 dark:text-gray-300 mb-2">
+    <div className="bg-popover border border-border rounded-lg shadow-lg p-3 text-xs">
+      <p className="font-medium text-foreground mb-2">
         {label ? formatDateLabel(label) : ""}
       </p>
       {payload.map((item) => (
@@ -73,10 +87,10 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
             className="w-2 h-2 rounded-full flex-shrink-0"
             style={{ backgroundColor: item.color }}
           />
-          <span className="text-gray-600 dark:text-gray-400 capitalize">
+          <span className="text-muted-foreground capitalize">
             {item.name}:
           </span>
-          <span className="font-semibold text-gray-900 dark:text-gray-100">
+          <span className="font-semibold text-foreground">
             {item.value.toLocaleString()}
           </span>
         </div>
@@ -92,6 +106,8 @@ export function TrafficChart({
   currentPeriod,
   onPeriodChange,
 }: TrafficChartProps) {
+  const [c1, c2, c3] = useChartColors();
+
   // Format dates for display while keeping original as data key
   const chartData = data.map((d) => ({
     ...d,
@@ -107,30 +123,30 @@ export function TrafficChart({
   const subtitle = startDate && endDate ? `${startDate} – ${endDate}` : "";
 
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5">
+    <div className="bg-card border border-border rounded-xl p-5">
       {/* Header */}
       <div className="flex items-start justify-between mb-5">
         <div>
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-            Traffic Overview
+          <h2 className="text-sm font-semibold text-foreground">
+            트래픽 현황
           </h2>
           {subtitle && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               {subtitle}
             </p>
           )}
         </div>
 
         {/* Period selector */}
-        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
           {PERIODS.map((period) => (
             <button
               key={period.value}
               onClick={() => onPeriodChange(period.value)}
               className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
                 currentPeriod === period.value
-                  ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
-                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {period.label}
@@ -147,29 +163,28 @@ export function TrafficChart({
         >
           <defs>
             <linearGradient id="gradDau" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15} />
-              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+              <stop offset="5%" stopColor={c1} stopOpacity={0.15} />
+              <stop offset="95%" stopColor={c1} stopOpacity={0} />
             </linearGradient>
             <linearGradient id="gradSearches" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#10b981" stopOpacity={0.12} />
-              <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+              <stop offset="5%" stopColor={c2} stopOpacity={0.12} />
+              <stop offset="95%" stopColor={c2} stopOpacity={0} />
             </linearGradient>
             <linearGradient id="gradClicks" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.1} />
-              <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+              <stop offset="5%" stopColor={c3} stopOpacity={0.1} />
+              <stop offset="95%" stopColor={c3} stopOpacity={0} />
             </linearGradient>
           </defs>
 
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="#e5e7eb"
-            className="dark:stroke-gray-800"
+            stroke="var(--border)"
             vertical={false}
           />
 
           <XAxis
             dataKey="date"
-            tick={{ fontSize: 11, fill: "#9ca3af" }}
+            tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
             tickLine={false}
             axisLine={false}
             interval={interval}
@@ -177,7 +192,7 @@ export function TrafficChart({
           />
 
           <YAxis
-            tick={{ fontSize: 11, fill: "#9ca3af" }}
+            tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
             tickLine={false}
             axisLine={false}
             width={40}
@@ -186,7 +201,7 @@ export function TrafficChart({
           <Tooltip
             content={<CustomTooltip />}
             cursor={{
-              stroke: "#6b7280",
+              stroke: "var(--muted-foreground)",
               strokeWidth: 1,
               strokeDasharray: "4 4",
             }}
@@ -203,8 +218,8 @@ export function TrafficChart({
           <Area
             type="monotone"
             dataKey="dau"
-            name="DAU"
-            stroke="#3b82f6"
+            name="일간 활성"
+            stroke={c1}
             strokeWidth={2}
             fill="url(#gradDau)"
             dot={false}
@@ -214,8 +229,8 @@ export function TrafficChart({
           <Area
             type="monotone"
             dataKey="searches"
-            name="Searches"
-            stroke="#10b981"
+            name="검색"
+            stroke={c2}
             strokeWidth={2}
             fill="url(#gradSearches)"
             dot={false}
@@ -225,8 +240,8 @@ export function TrafficChart({
           <Area
             type="monotone"
             dataKey="clicks"
-            name="Clicks"
-            stroke="#f59e0b"
+            name="클릭"
+            stroke={c3}
             strokeWidth={2}
             fill="url(#gradClicks)"
             dot={false}
@@ -242,25 +257,25 @@ export function TrafficChart({
 
 export function TrafficChartSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5">
+    <div className="bg-card border border-border rounded-xl p-5">
       {/* Header skeleton */}
       <div className="flex items-start justify-between mb-5">
         <div>
-          <div className="h-4 w-32 animate-pulse bg-gray-200 dark:bg-gray-800 rounded mb-2" />
-          <div className="h-3 w-40 animate-pulse bg-gray-200 dark:bg-gray-800 rounded" />
+          <div className="h-4 w-32 animate-pulse bg-muted rounded mb-2" />
+          <div className="h-3 w-40 animate-pulse bg-muted rounded" />
         </div>
         {/* Period selector skeleton */}
         <div className="flex gap-1">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-7 w-10 animate-pulse bg-gray-200 dark:bg-gray-800 rounded-md"
+              className="h-7 w-10 animate-pulse bg-muted rounded-md"
             />
           ))}
         </div>
       </div>
       {/* Chart area skeleton */}
-      <div className="h-[300px] animate-pulse bg-gray-100 dark:bg-gray-800 rounded-lg" />
+      <div className="h-[300px] animate-pulse bg-muted rounded-lg" />
     </div>
   );
 }

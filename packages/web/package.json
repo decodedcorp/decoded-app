@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "verify:supabase": "node scripts/verify-supabase.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -15,7 +16,7 @@
     "@decoded/shared": "workspace:*",
     "@gsap/react": "^2.1.2",
     "@radix-ui/react-slot": "^1.2.4",
-    "@supabase/auth-helpers-nextjs": "^0.15.0",
+    "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.86.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tanstack/react-query": "^5.90.11",
@@ -34,10 +35,12 @@
     "react-icons": "^5.5.0",
     "react-is": "^19.2.4",
     "react-markdown": "^10.1.0",
+    "react-rnd": "^10.5.2",
     "recharts": "^3.7.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "three": "^0.167.1",
+    "undici": "^7.22.0",
     "zustand": "^4.5.7"
   },
   "devDependencies": {

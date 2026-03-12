@@ -17,8 +17,6 @@ import {
   fetchUnifiedImages,
   fetchRelatedImagesByAccount,
 } from "@decoded/shared/supabase/queries/images";
-import { fetchPostDetail } from "@/lib/api/posts";
-import { postDetailToImageDetail } from "@/lib/api/adapters/postDetailToImageDetail";
 import type {
   CategoryFilter,
   ImagePage,
@@ -230,22 +228,6 @@ export function useInfinitePosts(params: {
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 1,
-    staleTime: 1000 * 60,
-    gcTime: 1000 * 60 * 5,
-  });
-}
-
-/**
- * Fetch post detail via API and convert to ImageDetail for ImageDetailContent
- */
-export function usePostDetailForImage(postId: string) {
-  return useQuery<ImageDetail | null>({
-    queryKey: ["posts", "detail", "image", postId],
-    queryFn: async () => {
-      const post = await fetchPostDetail(postId);
-      return postDetailToImageDetail(post, postId);
-    },
-    enabled: !!postId,
     staleTime: 1000 * 60,
     gcTime: 1000 * 60 * 5,
   });

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ArrowLeft,
+  BookOpen,
   LayoutDashboard,
   ScanSearch,
   DollarSign,
@@ -22,11 +23,12 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/admin/ai-audit", label: "AI Audit", icon: ScanSearch },
-  { href: "/admin/ai-cost", label: "AI Cost", icon: DollarSign },
-  { href: "/admin/pipeline-logs", label: "Pipeline Logs", icon: GitBranch },
-  { href: "/admin/server-logs", label: "Server Logs", icon: Server },
+  { href: "/admin", label: "대시보드", icon: LayoutDashboard, exact: true },
+  { href: "/admin/magazines", label: "매거진", icon: BookOpen },
+  { href: "/admin/ai-audit", label: "AI 감사", icon: ScanSearch },
+  { href: "/admin/ai-cost", label: "AI 비용", icon: DollarSign },
+  { href: "/admin/pipeline-logs", label: "파이프라인 로그", icon: GitBranch },
+  { href: "/admin/server-logs", label: "서버 로그", icon: Server },
 ];
 
 interface AdminSidebarProps {
@@ -36,10 +38,10 @@ interface AdminSidebarProps {
 }
 
 /**
- * AdminSidebar - Dark theme sidebar for admin navigation
+ * AdminSidebar - Sidebar for admin navigation (design system tokens)
  *
  * Width: 220px (compact, maximizes content area)
- * Theme: Dark (bg-gray-900) with light text
+ * Theme: Uses sidebar semantic tokens (bg-sidebar, border-sidebar-border, etc.)
  * Features: Active route detection, logout, back-to-app link
  */
 export function AdminSidebar({
@@ -75,7 +77,7 @@ export function AdminSidebar({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 h-full w-[220px] bg-gray-900 text-gray-100 flex flex-col z-50",
+          "fixed top-0 left-0 h-full w-[220px] bg-sidebar text-sidebar-foreground flex flex-col z-50",
           "transition-transform duration-200 ease-in-out",
           // Mobile: hidden by default, shown when open
           // Desktop: always visible
@@ -83,24 +85,24 @@ export function AdminSidebar({
         )}
       >
         {/* Logo / Title area */}
-        <div className="px-4 py-5 border-b border-gray-800 flex-shrink-0">
-          <p className="text-sm font-semibold text-white tracking-wide mb-2">
-            Decoded Admin
+        <div className="px-4 py-5 border-b border-sidebar-border flex-shrink-0">
+          <p className="text-sm font-semibold text-sidebar-foreground tracking-wide mb-2">
+            디코디드 관리자
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-200 transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-sidebar-accent-foreground hover:text-sidebar-foreground transition-colors"
             onClick={onClose}
           >
             <ArrowLeft className="w-3 h-3" />
-            Back to App
+            앱으로 돌아가기
           </Link>
         </div>
 
         {/* Navigation */}
         <nav
           className="flex-1 py-4 overflow-y-auto"
-          aria-label="Admin navigation"
+          aria-label="관리자 네비게이션"
         >
           <ul className="space-y-0.5 px-2">
             {NAV_ITEMS.map((item) => {
@@ -115,8 +117,8 @@ export function AdminSidebar({
                       "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors",
                       "border-l-2",
                       active
-                        ? "bg-gray-800 text-white border-blue-500 font-medium"
-                        : "text-gray-400 border-transparent hover:bg-gray-800/60 hover:text-gray-200"
+                        ? "bg-sidebar-accent text-sidebar-foreground border-sidebar-accent-foreground font-medium hover:border-primary"
+                        : "text-sidebar-foreground/70 border-transparent hover:bg-sidebar-accent hover:text-sidebar-foreground hover:border-primary"
                     )}
                     aria-current={active ? "page" : undefined}
                   >
@@ -130,16 +132,16 @@ export function AdminSidebar({
         </nav>
 
         {/* Bottom: User + Logout */}
-        <div className="px-4 py-4 border-t border-gray-800 flex-shrink-0">
-          <p className="text-xs text-gray-500 mb-2 truncate" title={adminName}>
+        <div className="px-4 py-4 border-t border-sidebar-border flex-shrink-0">
+          <p className="text-xs text-sidebar-accent-foreground mb-2 truncate" title={adminName}>
             {adminName}
           </p>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 text-xs text-gray-400 hover:text-red-400 transition-colors w-full"
+            className="flex items-center gap-2 text-xs text-sidebar-accent-foreground hover:text-destructive transition-colors w-full"
           >
             <LogOut className="w-4 h-4" />
-            Logout
+            로그아웃
           </button>
         </div>
       </aside>

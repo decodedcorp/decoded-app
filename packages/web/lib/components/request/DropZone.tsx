@@ -9,6 +9,8 @@ interface DropZoneProps {
   disabled?: boolean;
   compact?: boolean;
   className?: string;
+  /** Override max images label (default from UPLOAD_CONFIG) */
+  maxImages?: number;
 }
 
 function DropZoneComponent({
@@ -16,6 +18,7 @@ function DropZoneComponent({
   disabled = false,
   compact = false,
   className = "",
+  maxImages = UPLOAD_CONFIG.maxImages,
 }: DropZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -171,7 +174,7 @@ function DropZoneComponent({
           JPG, PNG, WebP
         </span>
         <span>Max {UPLOAD_CONFIG.maxFileSize / (1024 * 1024)}MB</span>
-        <span>Up to {UPLOAD_CONFIG.maxImages} images</span>
+        <span>Up to {maxImages} images</span>
       </div>
     </div>
   );

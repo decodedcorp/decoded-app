@@ -18,7 +18,9 @@ interface MobileDetectionLayoutProps {
   isRevealing: boolean;
   selectedSpotId: string | null;
   onSelectSpot: (spotId: string | null) => void;
-  onSaveSolution?: (spotId: string, solution: SpotSolutionData) => void;
+  onAddSolution?: (spotId: string, solution: SpotSolutionData) => void;
+  onUpdateSolution?: (spotId: string, index: number, solution: SpotSolutionData) => void;
+  onRemoveSolution?: (spotId: string, index: number) => void;
   onAddSpot?: (x: number, y: number) => void;
 }
 
@@ -36,7 +38,9 @@ export function MobileDetectionLayout({
   isRevealing,
   selectedSpotId,
   onSelectSpot,
-  onSaveSolution,
+  onAddSolution,
+  onUpdateSolution,
+  onRemoveSolution,
   onAddSpot,
 }: MobileDetectionLayoutProps) {
   const { cardRefs, scrollContainerRef, selectSpot } = useSpotCardSync({
@@ -111,7 +115,9 @@ export function MobileDetectionLayout({
               spot={spot}
               isSelected={selectedSpotId === spot.id}
               onClick={() => handleCardClick(spot)}
-              onSaveSolution={onSaveSolution}
+              onAddSolution={onAddSolution}
+              onUpdateSolution={onUpdateSolution}
+              onRemoveSolution={onRemoveSolution}
             />
           ))}
         </div>

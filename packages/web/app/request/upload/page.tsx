@@ -61,7 +61,7 @@ export default function RequestUploadPage() {
     (userKnowsItems === false ||
       (userKnowsItems === true &&
         detectedSpots.every(
-          (s) => s.solution?.originalUrl && s.solution?.title
+          (s) => s.solutions.length > 0 && s.solutions.every((sol) => sol.originalUrl && sol.title)
         )));
 
   // Action은 getRequestActions()로 접근 (구독 없이)
@@ -138,22 +138,20 @@ export default function RequestUploadPage() {
               spots: detectedSpots.map((spot) => ({
                 position_left: `${(spot.center.x * 100).toFixed(1)}%`,
                 position_top: `${(spot.center.y * 100).toFixed(1)}%`,
-                solution: spot.solution
-                  ? {
-                      original_url: spot.solution.originalUrl,
-                      title: spot.solution.title,
-                      thumbnail_url: spot.solution.thumbnailUrl,
-                      description: spot.solution.description,
-                      metadata: spot.solution.priceAmount
-                        ? {
-                            price: {
-                              amount: String(spot.solution.priceAmount),
-                              currency: spot.solution.priceCurrency || "KRW",
-                            },
-                          }
-                        : undefined,
-                    }
-                  : undefined,
+                solutions: spot.solutions.map((sol) => ({
+                  original_url: sol.originalUrl,
+                  title: sol.title,
+                  thumbnail_url: sol.thumbnailUrl,
+                  description: sol.description,
+                  metadata: sol.priceAmount
+                    ? {
+                        price: {
+                          amount: String(sol.priceAmount),
+                          currency: sol.priceCurrency || "KRW",
+                        },
+                      }
+                    : undefined,
+                })),
               })),
             })
           : await createPostWithFile({
@@ -199,8 +197,8 @@ export default function RequestUploadPage() {
 
   // Solution save handler
   const handleSaveSolution = useCallback((spotId: string, solution: any) => {
-    getRequestActions().setSpotSolution(spotId, solution);
-    getRequestActions().selectSpot(null); // Deselect after saving
+    getRequestActions().addSpotSolution(spotId, solution);
+    getRequestActions().selectSpot(null);
   }, []);
 
   // Solution cancel handler
@@ -350,11 +348,11 @@ export default function RequestUploadPage() {
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate">
-                                {spot.solution?.title || spot.title}
+                                {spot.solutions[0]?.title || spot.title}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                {spot.solution
-                                  ? "링크 입력됨"
+                                {spot.solutions.length > 0
+                                  ? `링크 ${spot.solutions.length}개 입력됨`
                                   : userKnowsItems
                                     ? "탭하여 상품 링크 입력"
                                     : "위치 표시됨"}
@@ -374,7 +372,7 @@ export default function RequestUploadPage() {
                             userKnowsItems === true && (
                               <SolutionInputForm
                                 spotId={spot.id}
-                                initialData={spot.solution}
+                                initialData={spot.solutions[0]}
                                 onSave={handleSaveSolution}
                                 onCancel={handleCancelSolution}
                               />

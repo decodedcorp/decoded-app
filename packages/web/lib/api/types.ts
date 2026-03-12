@@ -145,13 +145,13 @@ export interface SpotSolution {
 }
 
 /**
- * Spot with solution request
+ * Spot with solutions request
  */
 export interface SpotWithSolutionRequest {
-  position_left: string; // 백분율 문자열 (예: "45.5%")
-  position_top: string; // 백분율 문자열 (예: "30.2%")
-  category_id: string; // UUID
-  solution: SpotSolution;
+  position_left: string;
+  position_top: string;
+  category_id: string;
+  solutions: SpotSolution[];
 }
 
 /**

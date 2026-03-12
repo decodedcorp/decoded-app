@@ -240,13 +240,13 @@ export interface CreatePostWithFileAndSolutionsRequest {
   spots: Array<{
     position_left: string;
     position_top: string;
-    solution?: {
+    solutions: Array<{
       original_url: string;
       title?: string;
       thumbnail_url?: string;
       description?: string;
       metadata?: Record<string, unknown>;
-    };
+    }>;
   }>;
   media_source: {
     type: string;

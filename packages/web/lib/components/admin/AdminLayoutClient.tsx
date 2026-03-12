@@ -15,7 +15,7 @@ interface AdminLayoutClientProps {
  * Desktop (md+): Fixed 220px sidebar on left, content offset by ml-[220px]
  * Mobile (<md): Compact top bar with hamburger, sidebar opens as overlay
  *
- * Content area: bg-gray-50 / dark:bg-gray-950 with p-6 md:p-8 padding
+ * Content area: bg-background with p-6 md:p-8 padding
  */
 export function AdminLayoutClient({
   children,
@@ -32,7 +32,7 @@ export function AdminLayoutClient({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-background">
       {/* Sidebar (desktop: always visible, mobile: overlay) */}
       <AdminSidebar
         isOpen={sidebarOpen}
@@ -41,16 +41,16 @@ export function AdminLayoutClient({
       />
 
       {/* Mobile top bar (hidden on desktop) */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-30 h-14 bg-gray-900 flex items-center px-4 gap-3">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-30 h-14 bg-sidebar flex items-center px-4 gap-3">
         <button
           onClick={openSidebar}
-          className="p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-          aria-label="Open navigation"
+          className="p-2 rounded-md text-sidebar-accent-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+          aria-label="네비게이션 열기"
           aria-expanded={sidebarOpen}
         >
           <Menu className="w-5 h-5" />
         </button>
-        <span className="text-sm font-semibold text-white">Decoded Admin</span>
+        <span className="text-sm font-semibold text-sidebar-foreground">디코디드 관리자</span>
       </div>
 
       {/* Main content area */}

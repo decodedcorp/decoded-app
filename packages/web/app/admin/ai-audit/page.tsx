@@ -75,10 +75,10 @@ function AiAuditContent() {
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-          AI Audit
+          AI 감사
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Review and manage AI analysis results
+          AI 분석 결과 검토 및 관리
         </p>
       </div>
 

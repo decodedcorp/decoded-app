@@ -33,17 +33,17 @@ function KPICard({ label, value, delta, icon }: KPICardData) {
   const isPositive = (delta ?? 0) > 0;
 
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5">
+    <div className="bg-card border border-border rounded-xl p-5">
       {/* Label row */}
       <div className="flex items-center gap-1.5 mb-3">
-        <span className="text-gray-400 dark:text-gray-500">{icon}</span>
-        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+        <span className="text-muted-foreground">{icon}</span>
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           {label}
         </span>
       </div>
 
       {/* Value */}
-      <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+      <div className="text-2xl font-bold text-foreground mb-2">
         {formatNumber(value)}
       </div>
 
@@ -51,7 +51,7 @@ function KPICard({ label, value, delta, icon }: KPICardData) {
       {hasDelta ? (
         <div
           className={`flex items-center gap-1 text-xs font-medium ${
-            isPositive ? "text-emerald-500" : "text-red-500"
+            isPositive ? "text-primary" : "text-destructive"
           }`}
         >
           {isPositive ? (
@@ -65,8 +65,8 @@ function KPICard({ label, value, delta, icon }: KPICardData) {
           </span>
         </div>
       ) : (
-        <div className="text-xs text-gray-400 dark:text-gray-600">
-          No change
+        <div className="text-xs text-muted-foreground">
+          변동 없음
         </div>
       )}
     </div>
@@ -82,31 +82,31 @@ interface KPICardsProps {
 export function KPICards({ data }: KPICardsProps) {
   const cards: KPICardData[] = [
     {
-      label: "Daily Active Users",
+      label: "일간 활성 사용자",
       value: data.dau,
       delta: data.dauDelta,
       icon: <Users className="w-3.5 h-3.5" />,
     },
     {
-      label: "Monthly Active Users",
+      label: "월간 활성 사용자",
       value: data.mau,
       delta: data.mauDelta,
       icon: <UserCheck className="w-3.5 h-3.5" />,
     },
     {
-      label: "Total Users",
+      label: "총 사용자",
       value: data.totalUsers,
       delta: data.totalUsersDelta,
       icon: <UsersRound className="w-3.5 h-3.5" />,
     },
     {
-      label: "Total Posts",
+      label: "총 게시물",
       value: data.totalPosts,
       delta: data.totalPostsDelta,
       icon: <FileImage className="w-3.5 h-3.5" />,
     },
     {
-      label: "Total Solutions",
+      label: "총 솔루션",
       value: data.totalSolutions,
       delta: data.totalSolutionsDelta,
       icon: <ShoppingBag className="w-3.5 h-3.5" />,
@@ -126,13 +126,13 @@ export function KPICards({ data }: KPICardsProps) {
 
 function KPICardSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5">
+    <div className="bg-card border border-border rounded-xl p-5">
       {/* Label row skeleton */}
-      <div className="h-3 w-28 animate-pulse bg-gray-200 dark:bg-gray-800 rounded mb-4" />
+      <div className="h-3 w-28 animate-pulse bg-muted rounded mb-4" />
       {/* Value skeleton */}
-      <div className="h-7 w-20 animate-pulse bg-gray-200 dark:bg-gray-800 rounded mb-3" />
+      <div className="h-7 w-20 animate-pulse bg-muted rounded mb-3" />
       {/* Delta skeleton */}
-      <div className="h-3 w-14 animate-pulse bg-gray-200 dark:bg-gray-800 rounded" />
+      <div className="h-3 w-14 animate-pulse bg-muted rounded" />
     </div>
   );
 }

@@ -37,11 +37,11 @@ export default function AdminDashboardPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-          Dashboard
+        <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-foreground">
+          대시보드
         </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Service overview and key metrics
+        <p className="text-sm text-muted-foreground mt-1">
+          서비스 현황 및 주요 지표
         </p>
       </div>
 

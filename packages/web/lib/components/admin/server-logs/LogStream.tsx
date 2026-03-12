@@ -37,16 +37,16 @@ function LogLine({ entry }: { entry: ServerLogEntry }) {
   const levelColor = LEVEL_TERMINAL_COLORS[entry.level];
 
   return (
-    <div className="leading-5 hover:bg-white/5 px-4 py-0.5 group">
+    <div className="leading-5 hover:bg-accent/20 px-4 py-0.5 group">
       {/* [HH:MM:SS] LEVEL  METHOD ENDPOINT STATUS RESPONSEms — MESSAGE */}
-      <span className="text-gray-500">[{formatTime(entry.timestamp)}]</span>{" "}
+      <span className="text-muted-foreground">[{formatTime(entry.timestamp)}]</span>{" "}
       <span className={`${levelColor} font-semibold`}>
         {pad(entry.level.toUpperCase(), 5)}
       </span>{" "}
-      <span className="text-gray-300 font-semibold">{pad(entry.method, 6)}</span>
-      <span className="text-gray-400">{entry.endpoint}</span>{" "}
-      <span className="text-gray-300 tabular-nums">{entry.statusCode}</span>{" "}
-      <span className="text-gray-500 tabular-nums">{entry.responseTimeMs}ms</span>
+      <span className="text-foreground font-semibold">{pad(entry.method, 6)}</span>
+      <span className="text-muted-foreground">{entry.endpoint}</span>{" "}
+      <span className="text-foreground tabular-nums">{entry.statusCode}</span>{" "}
+      <span className="text-muted-foreground tabular-nums">{entry.responseTimeMs}ms</span>
       {" — "}
       <span className={levelColor}>{entry.message}</span>
     </div>
@@ -110,40 +110,40 @@ export function LogStream() {
   }, []);
 
   return (
-    <div className="bg-gray-950 rounded-lg border border-gray-800 overflow-hidden font-mono">
+    <div className="bg-card rounded-lg border border-border overflow-hidden font-mono">
       {/* Header bar */}
-      <div className="bg-gray-900 px-4 py-2 flex items-center justify-between border-b border-gray-800">
+      <div className="bg-muted/50 px-4 py-2 flex items-center justify-between border-b border-border">
         <div className="flex items-center gap-2">
           {/* Status dot */}
           <span
             className={`inline-block w-2 h-2 rounded-full ${
               isStreaming && !isPaused
-                ? "bg-emerald-400 animate-pulse"
-                : "bg-gray-500"
+                ? "bg-primary animate-pulse"
+                : "bg-muted-foreground"
             }`}
             aria-hidden="true"
           />
-          <span className="text-xs font-semibold text-gray-200 tracking-wide">
-            Live Logs
+          <span className="text-xs font-semibold text-foreground tracking-wide">
+            실시간 로그
           </span>
           {isPaused && (
-            <span className="text-xs text-gray-500 ml-1">(paused)</span>
+            <span className="text-xs text-muted-foreground ml-1">(일시정지)</span>
           )}
         </div>
 
         <div className="flex items-center gap-2">
           {/* Entry count badge */}
-          <span className="text-xs text-gray-500 tabular-nums">
-            {entries.length.toLocaleString()} entries
+          <span className="text-xs text-muted-foreground tabular-nums">
+            {entries.length.toLocaleString()}건
           </span>
 
           {/* Pause/Resume toggle */}
           <button
             type="button"
             onClick={toggle}
-            title={isPaused || !isStreaming ? "Resume streaming" : "Pause streaming"}
-            className="p-1.5 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
-            aria-label={isPaused || !isStreaming ? "Resume" : "Pause"}
+            title={isPaused || !isStreaming ? "스트리밍 재개" : "스트리밍 일시정지"}
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            aria-label={isPaused || !isStreaming ? "재개" : "일시정지"}
           >
             {isPaused || !isStreaming ? (
               <Play className="w-3.5 h-3.5" />
@@ -156,9 +156,9 @@ export function LogStream() {
           <button
             type="button"
             onClick={clear}
-            title="Clear log output"
-            className="p-1.5 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
-            aria-label="Clear"
+            title="로그 지우기"
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            aria-label="지우기"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -170,13 +170,13 @@ export function LogStream() {
         <div
           ref={scrollContainerRef}
           onScroll={handleScroll}
-          className="h-[400px] overflow-y-auto text-xs py-2"
+          className="h-[400px] overflow-y-auto text-xs py-2 bg-background"
         >
           {entries.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-gray-600 text-xs">
+            <div className="flex items-center justify-center h-full text-muted-foreground text-xs">
               {isStreaming && !isPaused
-                ? "Waiting for log entries..."
-                : "Stream paused. Press play to resume."}
+                ? "로그 항목 대기 중..."
+                : "스트리밍 일시정지. 재생 버튼을 눌러 재개하세요."}
             </div>
           ) : (
             entries.map((entry) => <LogLine key={entry.id} entry={entry} />)
@@ -189,9 +189,9 @@ export function LogStream() {
             <button
               type="button"
               onClick={jumpToBottom}
-              className="px-3 py-1 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-full border border-gray-700 transition-colors shadow-lg"
+              className="px-3 py-1 text-xs bg-muted hover:bg-accent text-foreground rounded-full border border-border transition-colors shadow-lg"
             >
-              Jump to bottom
+              맨 아래로
             </button>
           </div>
         )}

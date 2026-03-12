@@ -1,7 +1,7 @@
 "use client";
 
-import { SupabaseClient } from "@supabase/supabase-js";
-import { initSupabase } from "@decoded/shared";
+import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
 // Environment variables
@@ -15,13 +15,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 /**
- * Typed Supabase client for browser use
- * Uses singleton pattern from @decoded/shared to prevent multiple instances
+ * Typed Supabase client for browser use.
+ * Uses createBrowserClient from @supabase/ssr — stores session in cookies
+ * so the server middleware can read it for /admin protection.
  */
-export const supabaseBrowserClient: SupabaseClient<Database> = initSupabase(
-  supabaseUrl,
-  supabaseAnonKey
-) as unknown as SupabaseClient<Database>;
+export const supabaseBrowserClient: SupabaseClient<Database> =
+  createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
 
 /**
  * Get the Supabase client instance

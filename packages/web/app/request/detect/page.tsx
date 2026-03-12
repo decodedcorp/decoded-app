@@ -27,7 +27,9 @@ export default function RequestDetectPage() {
 
   const selectSpot = useRequestStore((s) => s.selectSpot);
   const addSpot = useRequestStore((s) => s.addSpot);
-  const setSpotSolution = useRequestStore((s) => s.setSpotSolution);
+  const addSpotSolution = useRequestStore((s) => s.addSpotSolution);
+  const updateSpotSolution = useRequestStore((s) => s.updateSpotSolution);
+  const removeSpotSolution = useRequestStore((s) => s.removeSpotSolution);
   const resetRequestFlow = useRequestStore((s) => s.resetRequestFlow);
   const setStep = useRequestStore((s) => s.setStep);
 
@@ -109,7 +111,9 @@ export default function RequestDetectPage() {
           isRevealing={false}
           selectedSpotId={selectedSpotId}
           onSelectSpot={handleSelectSpot}
-          onSaveSolution={setSpotSolution}
+          onAddSolution={addSpotSolution}
+          onUpdateSolution={updateSpotSolution}
+          onRemoveSolution={removeSpotSolution}
           onAddSpot={handleAddSpot}
         />
       )}
@@ -124,7 +128,9 @@ export default function RequestDetectPage() {
             isRevealing={false}
             selectedSpotId={selectedSpotId}
             onSelectSpot={handleSelectSpot}
-            onSaveSolution={setSpotSolution}
+            onAddSolution={addSpotSolution}
+            onUpdateSolution={updateSpotSolution}
+            onRemoveSolution={removeSpotSolution}
             onAddSpot={handleAddSpot}
           />
         </main>

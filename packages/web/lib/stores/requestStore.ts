@@ -61,8 +61,8 @@ export interface DetectedSpot {
   imageUrl?: string; // 아이템 썸네일 이미지
   confidence?: number; // AI 신뢰도
 
-  // Solution (사용자가 알고 있는 상품 정보)
-  solution?: SpotSolutionData;
+  // Solutions (사용자가 알고 있는 상품 정보, 복수)
+  solutions: SpotSolutionData[];
 }
 
 // AI 메타데이터 (Step 3 초기값으로 사용)
@@ -121,8 +121,10 @@ interface RequestState {
   removeSpot: (spotId: string) => void;
 
   // Actions - Solution
-  setSpotSolution: (spotId: string, solution: SpotSolutionData) => void;
-  clearSpotSolution: (spotId: string) => void;
+  addSpotSolution: (spotId: string, solution: SpotSolutionData) => void;
+  updateSpotSolution: (spotId: string, index: number, solution: SpotSolutionData) => void;
+  removeSpotSolution: (spotId: string, index: number) => void;
+  clearSpotSolutions: (spotId: string) => void;
 
   // Actions - Details (Step 3)
   setDescription: (description: string) => void;
@@ -168,6 +170,7 @@ function convertApiToSpot(item: DetectedItem, index: number): DetectedSpot {
     title: item.label,
     description: `Detected with ${Math.round(item.confidence * 100)}% confidence`,
     confidence: item.confidence,
+    solutions: [],
   };
 }
 
@@ -361,9 +364,10 @@ export const useRequestStore = create<RequestState>((set, get) => ({
       id: `spot_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
       index: newIndex,
       center: { x, y },
-      categoryCode: categoryCode || "fashion", // 기본 카테고리
+      categoryCode: categoryCode || "fashion",
       title: `Spot ${newIndex}`,
       description: "Tap to add product info",
+      solutions: [],
     };
 
     set((state) => ({
@@ -379,7 +383,7 @@ export const useRequestStore = create<RequestState>((set, get) => ({
       const reindexedSpots = filteredSpots.map((spot, idx) => ({
         ...spot,
         index: idx + 1,
-        title: spot.solution?.title || `Spot ${idx + 1}`,
+        title: spot.solutions[0]?.title || `Spot ${idx + 1}`,
       }));
       return {
         detectedSpots: reindexedSpots,
@@ -390,18 +394,48 @@ export const useRequestStore = create<RequestState>((set, get) => ({
   },
 
   // Solution Actions
-  setSpotSolution: (spotId, solution) => {
+  addSpotSolution: (spotId, solution) => {
     set((state) => ({
       detectedSpots: state.detectedSpots.map((spot) =>
-        spot.id === spotId ? { ...spot, solution } : spot
+        spot.id === spotId
+          ? { ...spot, solutions: [...spot.solutions, solution] }
+          : spot
       ),
     }));
   },
 
-  clearSpotSolution: (spotId) => {
+  updateSpotSolution: (spotId, index, solution) => {
     set((state) => ({
       detectedSpots: state.detectedSpots.map((spot) =>
-        spot.id === spotId ? { ...spot, solution: undefined } : spot
+        spot.id === spotId
+          ? {
+              ...spot,
+              solutions: spot.solutions.map((s, i) =>
+                i === index ? solution : s
+              ),
+            }
+          : spot
+      ),
+    }));
+  },
+
+  removeSpotSolution: (spotId, index) => {
+    set((state) => ({
+      detectedSpots: state.detectedSpots.map((spot) =>
+        spot.id === spotId
+          ? {
+              ...spot,
+              solutions: spot.solutions.filter((_, i) => i !== index),
+            }
+          : spot
+      ),
+    }));
+  },
+
+  clearSpotSolutions: (spotId) => {
+    set((state) => ({
+      detectedSpots: state.detectedSpots.map((spot) =>
+        spot.id === spotId ? { ...spot, solutions: [] } : spot
       ),
     }));
   },
@@ -522,9 +556,9 @@ export const selectAiMetadata = (state: RequestState) => state.aiMetadata;
 
 // Solution selectors
 export const selectHasSolutions = (state: RequestState): boolean =>
-  state.detectedSpots.some((spot) => spot.solution !== undefined);
+  state.detectedSpots.some((spot) => spot.solutions.length > 0);
 export const selectSpotsWithSolutions = (state: RequestState) =>
-  state.detectedSpots.filter((spot) => spot.solution !== undefined);
+  state.detectedSpots.filter((spot) => spot.solutions.length > 0);
 
 // Step 3 selectors
 export const selectDescription = (state: RequestState) => state.description;
@@ -559,8 +593,10 @@ export const getRequestActions = () => {
     selectSpot: state.selectSpot,
     addSpot: state.addSpot,
     removeSpot: state.removeSpot,
-    setSpotSolution: state.setSpotSolution,
-    clearSpotSolution: state.clearSpotSolution,
+    addSpotSolution: state.addSpotSolution,
+    updateSpotSolution: state.updateSpotSolution,
+    removeSpotSolution: state.removeSpotSolution,
+    clearSpotSolutions: state.clearSpotSolutions,
     setDescription: state.setDescription,
     setExtractedMetadata: state.setExtractedMetadata,
     setIsExtractingMetadata: state.setIsExtractingMetadata,

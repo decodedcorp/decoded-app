@@ -2,7 +2,14 @@
 
 import { memo, forwardRef, useState, useCallback } from "react";
 import Image from "next/image";
-import { ChevronDown, ChevronUp, ExternalLink, Check } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  Check,
+  Trash2,
+  Pencil,
+} from "lucide-react";
 import {
   type DetectedSpot,
   type SpotSolutionData,
@@ -13,39 +20,73 @@ interface DetectedItemCardProps {
   spot: DetectedSpot;
   isSelected: boolean;
   onClick: () => void;
-  onSaveSolution?: (spotId: string, solution: SpotSolutionData) => void;
+  onAddSolution?: (spotId: string, solution: SpotSolutionData) => void;
+  onUpdateSolution?: (
+    spotId: string,
+    index: number,
+    solution: SpotSolutionData
+  ) => void;
+  onRemoveSolution?: (spotId: string, index: number) => void;
 }
 
-/**
- * DetectedItemCard - 컴팩트한 아이템 카드 (썸네일 포함)
- * 선택 시 확장되어 solution 입력 폼 표시
- */
 export const DetectedItemCard = memo(
   forwardRef<HTMLDivElement, DetectedItemCardProps>(
-    ({ spot, isSelected, onClick, onSaveSolution }, ref) => {
-      const [isEditing, setIsEditing] = useState(false);
-      const hasSolution = !!spot.solution;
+    (
+      { spot, isSelected, onClick, onAddSolution, onUpdateSolution, onRemoveSolution },
+      ref
+    ) => {
+      const [isAdding, setIsAdding] = useState(false);
+      const [editingIndex, setEditingIndex] = useState<number | null>(null);
+      const hasSolutions = spot.solutions.length > 0;
 
       const handleCardClick = useCallback(() => {
         onClick();
-        // 선택 시 자동으로 편집 모드 열지 않음 (토글 버튼으로만)
       }, [onClick]);
 
-      const handleToggleEdit = useCallback((e: React.MouseEvent) => {
+      const handleToggleAdd = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
-        setIsEditing((prev) => !prev);
+        setIsAdding((prev) => !prev);
+        setEditingIndex(null);
       }, []);
 
-      const handleSaveSolution = useCallback(
-        (spotId: string, solution: SpotSolutionData) => {
-          onSaveSolution?.(spotId, solution);
-          setIsEditing(false);
+      const handleStartEdit = useCallback(
+        (e: React.MouseEvent, index: number) => {
+          e.stopPropagation();
+          setEditingIndex(index);
+          setIsAdding(false);
         },
-        [onSaveSolution]
+        []
+      );
+
+      const handleSaveNew = useCallback(
+        (_spotId: string, solution: SpotSolutionData) => {
+          onAddSolution?.(spot.id, solution);
+          setIsAdding(false);
+        },
+        [onAddSolution, spot.id]
+      );
+
+      const handleSaveEdit = useCallback(
+        (_spotId: string, solution: SpotSolutionData) => {
+          if (editingIndex !== null) {
+            onUpdateSolution?.(spot.id, editingIndex, solution);
+          }
+          setEditingIndex(null);
+        },
+        [onUpdateSolution, spot.id, editingIndex]
+      );
+
+      const handleRemove = useCallback(
+        (e: React.MouseEvent, index: number) => {
+          e.stopPropagation();
+          onRemoveSolution?.(spot.id, index);
+        },
+        [onRemoveSolution, spot.id]
       );
 
       const handleCancelEdit = useCallback(() => {
-        setIsEditing(false);
+        setIsAdding(false);
+        setEditingIndex(null);
       }, []);
 
       return (
@@ -115,10 +156,10 @@ export const DetectedItemCard = memo(
                       {spot.brand}
                     </span>
                   )}
-                  {hasSolution && (
+                  {hasSolutions && (
                     <span className="flex items-center gap-0.5 text-[10px] text-green-500">
                       <Check className="w-3 h-3" />
-                      Solution
+                      {spot.solutions.length}
                     </span>
                   )}
                 </div>
@@ -143,7 +184,7 @@ export const DetectedItemCard = memo(
               {/* Expand/Collapse Indicator */}
               {isSelected && (
                 <div className="flex-shrink-0 text-muted-foreground">
-                  {isEditing ? (
+                  {isAdding || editingIndex !== null ? (
                     <ChevronUp className="w-4 h-4" />
                   ) : (
                     <ChevronDown className="w-4 h-4" />
@@ -153,62 +194,82 @@ export const DetectedItemCard = memo(
             </div>
           </button>
 
-          {/* Solution Summary (when has solution and not editing) */}
-          {isSelected && hasSolution && !isEditing && (
-            <div className="mt-3 pt-3 border-t border-border/50">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {spot.solution!.title}
-                  </p>
-                  {spot.solution!.priceAmount && (
-                    <p className="text-xs text-muted-foreground">
-                      {spot.solution!.priceAmount.toLocaleString()}{" "}
-                      {spot.solution!.priceCurrency || "KRW"}
+          {/* Solutions List */}
+          {isSelected && hasSolutions && editingIndex === null && !isAdding && (
+            <div className="mt-3 pt-3 border-t border-border/50 space-y-2">
+              {spot.solutions.map((sol, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between py-1.5"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {sol.title}
                     </p>
-                  )}
+                    {sol.priceAmount && (
+                      <p className="text-xs text-muted-foreground">
+                        {sol.priceAmount.toLocaleString()}{" "}
+                        {sol.priceCurrency || "KRW"}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-1 ml-2 flex-shrink-0">
+                    <a
+                      href={sol.originalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                    <button
+                      type="button"
+                      onClick={(e) => handleStartEdit(e, idx)}
+                      className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handleRemove(e, idx)}
+                      className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2 ml-2">
-                  <a
-                    href={spot.solution!.originalUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                  <button
-                    type="button"
-                    onClick={handleToggleEdit}
-                    className="px-2 py-1 text-xs text-muted-foreground hover:text-foreground
-                               bg-muted rounded transition-colors"
-                  >
-                    수정
-                  </button>
-                </div>
-              </div>
+              ))}
             </div>
           )}
 
-          {/* Add Solution Button (when selected and no solution) */}
-          {isSelected && !hasSolution && !isEditing && (
+          {/* Add Solution Button */}
+          {isSelected && editingIndex === null && !isAdding && (
             <button
               type="button"
-              onClick={handleToggleEdit}
-              className="mt-3 w-full py-2 text-sm text-primary border border-dashed border-primary/50
+              onClick={handleToggleAdd}
+              className="mt-2 w-full py-2 text-sm text-primary border border-dashed border-primary/50
                          rounded-lg hover:bg-primary/5 transition-colors"
             >
               + 상품 정보 추가
             </button>
           )}
 
-          {/* Solution Input Form (when editing) */}
-          {isSelected && isEditing && (
+          {/* New Solution Form */}
+          {isSelected && isAdding && (
             <SolutionInputForm
               spotId={spot.id}
-              initialData={spot.solution}
-              onSave={handleSaveSolution}
+              onSave={handleSaveNew}
+              onCancel={handleCancelEdit}
+            />
+          )}
+
+          {/* Edit Solution Form */}
+          {isSelected && editingIndex !== null && (
+            <SolutionInputForm
+              spotId={spot.id}
+              initialData={spot.solutions[editingIndex]}
+              onSave={handleSaveEdit}
               onCancel={handleCancelEdit}
             />
           )}

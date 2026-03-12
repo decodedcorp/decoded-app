@@ -60,7 +60,7 @@ function statusCodeColor(code: number): string {
 /** Returns row background class for error-level entries. */
 function rowBackground(entry: ServerLogEntry): string {
   if (entry.statusCode >= 500) {
-    return "bg-red-50/50 dark:bg-red-900/10";
+    return "bg-destructive/5";
   }
   return "";
 }
@@ -84,14 +84,14 @@ function LevelBadge({ level }: { level: LogLevel }) {
  */
 export function LogTableSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+    <div className="bg-card border border-border rounded-xl overflow-hidden">
       <div className="animate-pulse">
         {/* Header */}
-        <div className="border-b border-gray-100 dark:border-gray-800 px-4 py-3 flex gap-4">
+        <div className="border-b border-border px-4 py-3 flex gap-4">
           {[120, 60, 60, 200, 80, 80, 200].map((w, i) => (
             <div
               key={i}
-              className="h-3 bg-gray-200 dark:bg-gray-700 rounded"
+              className="h-3 bg-muted rounded"
               style={{ width: w }}
             />
           ))}
@@ -100,15 +100,15 @@ export function LogTableSkeleton() {
         {Array.from({ length: 10 }).map((_, i) => (
           <div
             key={i}
-            className="border-b border-gray-100 dark:border-gray-800 last:border-0 px-4 py-3 flex gap-4 items-center"
+            className="border-b border-border last:border-0 px-4 py-3 flex gap-4 items-center"
           >
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12" />
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-10" />
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-40" />
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-10" />
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16" />
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded flex-1" />
+            <div className="h-3 bg-muted rounded w-20" />
+            <div className="h-4 bg-muted rounded w-12" />
+            <div className="h-3 bg-muted rounded w-10" />
+            <div className="h-3 bg-muted rounded w-40" />
+            <div className="h-3 bg-muted rounded w-10" />
+            <div className="h-3 bg-muted rounded w-16" />
+            <div className="h-3 bg-muted rounded flex-1" />
           </div>
         ))}
       </div>
@@ -125,40 +125,40 @@ export function LogTableSkeleton() {
 export function LogTable({ data }: LogTableProps) {
   if (data.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
-        <div className="flex items-center justify-center py-16 text-sm text-gray-500 dark:text-gray-400">
-          No log entries found
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="flex items-center justify-center py-16 text-sm text-muted-foreground">
+          로그 항목이 없습니다
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+    <div className="bg-card border border-border rounded-xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[700px]">
           <thead>
-            <tr className="border-b border-gray-100 dark:border-gray-800">
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                Time
+            <tr className="border-b border-border">
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+                시간
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Level
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                레벨
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Method
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                메서드
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Endpoint
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                엔드포인트
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                Status
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+                상태
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                Time (ms)
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+                응답(ms)
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Message
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                메시지
               </th>
             </tr>
           </thead>
@@ -166,10 +166,10 @@ export function LogTable({ data }: LogTableProps) {
             {data.map((entry) => (
               <tr
                 key={entry.id}
-                className={`border-b border-gray-100 dark:border-gray-800 last:border-0 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/40 ${rowBackground(entry)}`}
+                className={`border-b border-border last:border-0 transition-colors hover:bg-accent/30 ${rowBackground(entry)}`}
               >
                 {/* Timestamp */}
-                <td className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                <td className="px-4 py-2 text-xs text-muted-foreground whitespace-nowrap">
                   {formatRelativeTime(entry.timestamp)}
                 </td>
 
@@ -181,7 +181,7 @@ export function LogTable({ data }: LogTableProps) {
                 {/* HTTP method */}
                 <td className="px-4 py-2">
                   <span
-                    className={`text-xs font-mono font-semibold ${METHOD_STYLES[entry.method] ?? "text-gray-600 dark:text-gray-400"}`}
+                    className={`text-xs font-mono font-semibold ${METHOD_STYLES[entry.method] ?? "text-muted-foreground"}`}
                   >
                     {entry.method}
                   </span>
@@ -189,7 +189,7 @@ export function LogTable({ data }: LogTableProps) {
 
                 {/* Endpoint */}
                 <td className="px-4 py-2">
-                  <span className="text-xs font-mono text-gray-700 dark:text-gray-300 truncate max-w-[200px] block">
+                  <span className="text-xs font-mono text-foreground truncate max-w-[200px] block">
                     {entry.endpoint}
                   </span>
                 </td>
@@ -202,13 +202,13 @@ export function LogTable({ data }: LogTableProps) {
                 </td>
 
                 {/* Response time */}
-                <td className="px-4 py-2 text-xs text-gray-600 dark:text-gray-400 tabular-nums whitespace-nowrap">
+                <td className="px-4 py-2 text-xs text-muted-foreground tabular-nums whitespace-nowrap">
                   {entry.responseTimeMs}ms
                 </td>
 
                 {/* Message (truncated) */}
                 <td className="px-4 py-2">
-                  <span className="text-xs text-gray-600 dark:text-gray-400 truncate max-w-[240px] block">
+                  <span className="text-xs text-muted-foreground truncate max-w-[240px] block">
                     {entry.message}
                   </span>
                 </td>

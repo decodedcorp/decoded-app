@@ -65,13 +65,13 @@ export function useCreatePost(options: UseCreatePostOptions = {}) {
         throw new Error("미디어 소스 정보가 필요합니다.");
       }
 
-      // Solution이 있는 spot이 하나라도 있는지 확인
-      const hasSolutions = detectedSpots.some((spot) => spot.solution);
+      const hasSolutions = detectedSpots.some(
+        (spot) => spot.solutions.length > 0
+      );
 
       if (hasSolutions) {
-        // Solution을 아는 유저 → /api/v1/posts/with-solution
         const spotsWithSolution: SpotWithSolutionRequest[] = detectedSpots
-          .filter((spot) => spot.solution)
+          .filter((spot) => spot.solutions.length > 0)
           .map((spot) => {
             const categoryId = spot.categoryCode
               ? categoryCodeMap.get(spot.categoryCode)
@@ -87,14 +87,14 @@ export function useCreatePost(options: UseCreatePostOptions = {}) {
               position_left: storeToApiCoord(spot.center.x),
               position_top: storeToApiCoord(spot.center.y),
               category_id: categoryId || "",
-              solution: {
-                title: spot.solution!.title,
-                original_url: spot.solution!.originalUrl,
-                thumbnail_url: spot.solution!.thumbnailUrl,
-                price_amount: spot.solution!.priceAmount,
-                price_currency: spot.solution!.priceCurrency || "KRW",
-                description: spot.solution!.description,
-              },
+              solutions: spot.solutions.map((sol) => ({
+                title: sol.title,
+                original_url: sol.originalUrl,
+                thumbnail_url: sol.thumbnailUrl,
+                price_amount: sol.priceAmount,
+                price_currency: sol.priceCurrency || "KRW",
+                description: sol.description,
+              })),
             };
           })
           .filter((s) => s.category_id);

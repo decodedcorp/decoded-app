@@ -1186,7 +1186,7 @@ __metadata:
     "@gsap/react": "npm:^2.1.2"
     "@playwright/test": "npm:^1.58.1"
     "@radix-ui/react-slot": "npm:^1.2.4"
-    "@supabase/auth-helpers-nextjs": "npm:^0.15.0"
+    "@supabase/ssr": "npm:^0.9.0"
     "@supabase/supabase-js": "npm:^2.86.0"
     "@tailwindcss/typography": "npm:^0.5.19"
     "@tanstack/react-query": "npm:^5.90.11"
@@ -1217,6 +1217,7 @@ __metadata:
     react-icons: "npm:^5.5.0"
     react-is: "npm:^19.2.4"
     react-markdown: "npm:^10.1.0"
+    react-rnd: "npm:^10.5.2"
     recharts: "npm:^3.7.0"
     shadcn: "npm:^3.5.0"
     sonner: "npm:^2.0.7"
@@ -1224,6 +1225,7 @@ __metadata:
     tailwindcss: "npm:^3.4.18"
     three: "npm:^0.167.1"
     typescript: "npm:^5.9.3"
+    undici: "npm:^7.22.0"
     zustand: "npm:^4.5.7"
   languageName: unknown
   linkType: soft
@@ -3355,17 +3357,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/auth-helpers-nextjs@npm:^0.15.0":
-  version: 0.15.0
-  resolution: "@supabase/auth-helpers-nextjs@npm:0.15.0"
-  dependencies:
-    cookie: "npm:^1.0.2"
-  peerDependencies:
-    "@supabase/supabase-js": ^2.76.1
-  checksum: 10c0/4a70240858d25a1d301cbb22d94ded50a45ba33e9e0375782e89268667f91f5cbdd50234d1b5a2ca8c67f22333ae11862e7d05cbb55f98e6899cf98ff19f5dd3
-  languageName: node
-  linkType: hard
-
 "@supabase/auth-js@npm:2.86.0":
   version: 2.86.0
   resolution: "@supabase/auth-js@npm:2.86.0"
@@ -3402,6 +3393,17 @@ __metadata:
     tslib: "npm:2.8.1"
     ws: "npm:^8.18.2"
   checksum: 10c0/5c18c79422436900540243f06bf64e15523ae2eaaf7111b7ee243d803b00f4d85e148cb03b686f03519bb97505b716fbb3aebf70e0adf187b464a6193cf477ce
+  languageName: node
+  linkType: hard
+
+"@supabase/ssr@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "@supabase/ssr@npm:0.9.0"
+  dependencies:
+    cookie: "npm:^1.0.2"
+  peerDependencies:
+    "@supabase/supabase-js": ^2.97.0
+  checksum: 10c0/72ae27d9f873c0fd69109126e9bbf1d6e994c5c3706041fca4daf1f6aa551402b3064c30178ad4fa4035156cd76cf537cddbc7c15000574365aa94651dbc3ec5
   languageName: node
   linkType: hard
 
@@ -5293,6 +5295,13 @@ __metadata:
   version: 1.0.4
   resolution: "clone@npm:1.0.4"
   checksum: 10c0/2176952b3649293473999a95d7bebfc9dc96410f6cbd3d2595cf12fd401f63a4bf41a7adbfd3ab2ff09ed60cb9870c58c6acdd18b87767366fabfc163700f13b
+  languageName: node
+  linkType: hard
+
+"clsx@npm:^1.1.1":
+  version: 1.2.1
+  resolution: "clsx@npm:1.2.1"
+  checksum: 10c0/34dead8bee24f5e96f6e7937d711978380647e936a22e76380290e35486afd8634966ce300fc4b74a32f3762c7d4c0303f442c3e259f4ce02374eb0c82834f27
   languageName: node
   linkType: hard
 
@@ -11248,6 +11257,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"re-resizable@npm:6.11.2":
+  version: 6.11.2
+  resolution: "re-resizable@npm:6.11.2"
+  peerDependencies:
+    react: ^16.13.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.13.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/964c37b02b03ba9103fd67e4a486cf8cb57856eb92508677d8e2a350ec2b2a978014ed7dd4e2531c90ba89eedb0982b613590311471bfd66b14fdec709a09f17
+  languageName: node
+  linkType: hard
+
 "react-devtools-core@npm:^6.1.5":
   version: 6.1.5
   resolution: "react-devtools-core@npm:6.1.5"
@@ -11278,6 +11297,19 @@ __metadata:
   peerDependencies:
     react: ^18.3.1
   checksum: 10c0/a752496c1941f958f2e8ac56239172296fcddce1365ce45222d04a1947e0cc5547df3e8447f855a81d6d39f008d7c32eab43db3712077f09e3f67c4874973e85
+  languageName: node
+  linkType: hard
+
+"react-draggable@npm:4.4.6":
+  version: 4.4.6
+  resolution: "react-draggable@npm:4.4.6"
+  dependencies:
+    clsx: "npm:^1.1.1"
+    prop-types: "npm:^15.8.1"
+  peerDependencies:
+    react: ">= 16.3.0"
+    react-dom: ">= 16.3.0"
+  checksum: 10c0/1e8cf47414a8554caa68447e5f27749bc40e1eabb4806e2dadcb39ab081d263f517d6aaec5231677e6b425603037c7e3386d1549898f9ffcc98a86cabafb2b9a
   languageName: node
   linkType: hard
 
@@ -11555,6 +11587,20 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/b5f3315bead75e72853f492c0b51ba8fb4fa09a4534d7fc42d6fcd59ca3e047cf213279ffc1e35b337e314ef5a04cb2b12544c85e0078802271731c27c09e5aa
+  languageName: node
+  linkType: hard
+
+"react-rnd@npm:^10.5.2":
+  version: 10.5.2
+  resolution: "react-rnd@npm:10.5.2"
+  dependencies:
+    re-resizable: "npm:6.11.2"
+    react-draggable: "npm:4.4.6"
+    tslib: "npm:2.6.2"
+  peerDependencies:
+    react: ">=16.3.0"
+    react-dom: ">=16.3.0"
+  checksum: 10c0/27215052246fcc0f74b1d9ead0445fdabb98e666272a8af33f4d735bcf13fb34240c064b1b59601c87c4387ddfeb44568a182f6138a3c04ce2596272b50ff2b5
   languageName: node
   linkType: hard
 
@@ -13278,6 +13324,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:2.6.2":
+  version: 2.6.2
+  resolution: "tslib@npm:2.6.2"
+  checksum: 10c0/e03a8a4271152c8b26604ed45535954c0a45296e32445b4b87f8a5abdb2421f40b59b4ca437c4346af0f28179780d604094eb64546bee2019d903d01c6c19bdb
+  languageName: node
+  linkType: hard
+
 "tslib@npm:2.8.1, tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.8.0":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
@@ -13462,6 +13515,13 @@ __metadata:
   version: 6.23.0
   resolution: "undici@npm:6.23.0"
   checksum: 10c0/d846b3fdfd05aa6081ba1eab5db6bbc21b283042c7a43722b86d1ee2bf749d7c990ceac0c809f9a07ffd88b1b0f4c0f548a8362c035088cb1997d63abdda499c
+  languageName: node
+  linkType: hard
+
+"undici@npm:^7.22.0":
+  version: 7.22.0
+  resolution: "undici@npm:7.22.0"
+  checksum: 10c0/09777c06f3f18f761f03e3a4c9c04fd9fcca8ad02ccea43602ee4adf73fcba082806f1afb637f6ea714ef6279c5323c25b16d435814c63db720f63bfc20d316b
   languageName: node
   linkType: hard
 

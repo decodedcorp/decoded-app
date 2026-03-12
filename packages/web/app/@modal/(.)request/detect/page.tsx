@@ -30,7 +30,9 @@ export default function ModalRequestDetectPage() {
 
   const selectSpot = useRequestStore((s) => s.selectSpot);
   const addSpot = useRequestStore((s) => s.addSpot);
-  const setSpotSolution = useRequestStore((s) => s.setSpotSolution);
+  const addSpotSolution = useRequestStore((s) => s.addSpotSolution);
+  const updateSpotSolution = useRequestStore((s) => s.updateSpotSolution);
+  const removeSpotSolution = useRequestStore((s) => s.removeSpotSolution);
   const resetRequestFlow = useRequestStore((s) => s.resetRequestFlow);
   const setStep = useRequestStore((s) => s.setStep);
 
@@ -159,7 +161,9 @@ export default function ModalRequestDetectPage() {
                       spot={spot}
                       isSelected={selectedSpotId === spot.id}
                       onClick={() => handleCardClick(spot)}
-                      onSaveSolution={setSpotSolution}
+                      onAddSolution={addSpotSolution}
+                      onUpdateSolution={updateSpotSolution}
+                      onRemoveSolution={removeSpotSolution}
                     />
                   ))}
                 </div>

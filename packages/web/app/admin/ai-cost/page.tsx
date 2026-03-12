@@ -22,9 +22,9 @@ import {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const PERIODS = [
-  { label: "7D", value: 7 },
-  { label: "30D", value: 30 },
-  { label: "90D", value: 90 },
+  { label: "7일", value: 7 },
+  { label: "30일", value: 30 },
+  { label: "90일", value: 90 },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -41,10 +41,10 @@ export default function AiCostPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-            AI Cost
+            AI 비용
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            API usage, token consumption, and cost estimation
+            API 사용량, 토큰 소비 및 비용 추정
           </p>
         </div>
         {/* Period Selector — page level, same style as Dashboard */}
