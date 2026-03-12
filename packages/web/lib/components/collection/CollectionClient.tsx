@@ -5,11 +5,10 @@ import dynamic from "next/dynamic";
 import { useMagazineStore } from "@/lib/stores/magazineStore";
 import { useStudioStore } from "@/lib/stores/studioStore";
 import { StudioLoader } from "./StudioLoader";
-import { IssueDetailPanel } from "./IssueDetailPanel";
 import { EmptyBookshelf } from "./EmptyBookshelf";
-import { StudioHUD } from "./StudioHUD";
 
-// Dynamic import for Spline — SSR disabled (WebGL)
+// Dynamic import for Spline — SSR disabled (WebGL).
+// SplineStudio includes: Spline canvas + StudioHUD + IssueDetailPanel + EmptyStudio
 const SplineStudio = dynamic(
   () =>
     import("./studio/SplineStudio").then((mod) => ({
@@ -45,7 +44,7 @@ export function CollectionClient() {
     return () => reset();
   }, [loadCollection, reset]);
 
-  // Loading state
+  // Loading state — data not yet fetched
   if (!hasLoaded) {
     return (
       <div className="min-h-screen bg-[#050505]">
@@ -54,7 +53,7 @@ export function CollectionClient() {
     );
   }
 
-  // WebGL fallback: render CSS bookshelf
+  // WebGL fallback: render CSS bookshelf with banner
   if (!webglSupported) {
     const FallbackView = dynamic(
       () =>
@@ -64,49 +63,40 @@ export function CollectionClient() {
       { ssr: false }
     );
     return (
-      <div className="min-h-screen">
-        <div>
-          <p className="text-center text-white/30 text-xs py-2">
-            3D studio requires WebGL. Showing classic view.
-          </p>
-          <FallbackView
-            issues={collectionIssues}
-            activeIssueId={focusedIssueId}
-            onSelectIssue={setFocusedIssueId}
-          />
-        </div>
-      </div>
+      <FallbackView
+        issues={collectionIssues}
+        activeIssueId={focusedIssueId}
+        onSelectIssue={setFocusedIssueId}
+      />
     );
   }
 
-  // Empty state — SplineStudio still renders (empty room scene), EmptyBookshelf overlaid
+  // Empty state — show empty Spline room + bookshelf empty state overlay
   if (collectionIssues.length === 0) {
     return (
       <div className="min-h-screen bg-[#050505] relative">
         <div className="relative w-full h-screen">
+          {/* SplineStudio includes EmptyStudio overlay */}
           <SplineStudio />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <EmptyBookshelf />
-          </div>
+          {/* Also show legacy empty bookshelf for immediate feedback before Spline loads */}
+          {!splineLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <EmptyBookshelf />
+            </div>
+          )}
         </div>
       </div>
     );
   }
 
-  // Main 3D Studio view
+  // Main 3D Studio view — SplineStudio self-contains all overlays
   return (
     <div className="min-h-screen bg-[#050505] relative">
-      {/* Studio HUD: sticky header with back button, title, issue count */}
-      <StudioHUD />
-
-      {/* Spline 3D scene — IssueDetailPanel + EmptyStudio are siblings inside SplineStudio */}
       <div className="relative w-full h-screen">
         {!splineLoaded && <StudioLoader />}
+        {/* SplineStudio renders: Spline canvas + StudioHUD + IssueDetailPanel + EmptyStudio */}
         <SplineStudio />
       </div>
-
-      {/* Issue detail panel — self-manages visibility via studioStore */}
-      <IssueDetailPanel />
     </div>
   );
 }

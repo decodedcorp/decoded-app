@@ -7,6 +7,9 @@ import { useStudioStore } from "@/lib/stores/studioStore";
 import { useMagazineStore } from "@/lib/stores/magazineStore";
 import { useSplineRuntime } from "./useSplineRuntime";
 import { useSplineBridge } from "./useSplineBridge";
+import { StudioHUD } from "../StudioHUD";
+import { IssueDetailPanel } from "../IssueDetailPanel";
+import { EmptyStudio } from "../EmptyStudio";
 
 // Placeholder path — replace with self-hosted .splinecode once scene is designed in Spline editor
 const SCENE_URL = "/spline/decoded-studio.splinecode";
@@ -14,6 +17,7 @@ const SCENE_URL = "/spline/decoded-studio.splinecode";
 /**
  * Spline 3D studio component.
  * Wraps <Spline> with runtime bridge, store integration, and interaction handlers.
+ * Renders overlay siblings: StudioHUD, IssueDetailPanel, EmptyStudio.
  *
  * NOTE: Must be dynamically imported with ssr:false by the consumer (e.g. CollectionClient).
  */
@@ -139,7 +143,8 @@ export function SplineStudio() {
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-[#050505]">
+    <div className="relative fixed inset-0 bg-[#050505]">
+      {/* 3D Spline canvas */}
       <Spline
         scene={SCENE_URL}
         onLoad={handleLoad}
@@ -147,6 +152,11 @@ export function SplineStudio() {
         onSplineMouseHover={handleMouseHover}
         style={{ width: "100%", height: "100%" }}
       />
+
+      {/* 2D HTML overlays — rendered as siblings on top of the canvas */}
+      <StudioHUD />
+      <IssueDetailPanel />
+      <EmptyStudio />
     </div>
   );
 }
