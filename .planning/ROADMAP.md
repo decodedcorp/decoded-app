@@ -72,7 +72,7 @@ Plans:
 **Goal:** 메인페이지(/)를 Cinema-to-Action 컨셉으로 리뉴얼. Zero-Template 레이아웃 엔진, Hero Tilt + Glow 애니메이션, Masonry Grid + Parallax, Soft Wall 로그인 유도, #eafd67 네온 테마. Mock 데이터 기반 프론트엔드 선행 구현.
 
 **Depends on:** m7-01 (theme system, MagazineRenderer 공유)
-**Plans:** 2/3 plans complete
+**Plans:** 3/3 plans complete
 
 Plans:
 - [x] m7-02-01-PLAN.md — Mock data + types + MainHero (Tilt/Glow/Noise)
