@@ -11,7 +11,7 @@ export { VotingButtons } from "./VotingButtons";
 export type { VotingButtonsProps } from "./VotingButtons";
 
 export { CommentSection } from "./CommentSection";
-export type { CommentSectionProps, Comment } from "./CommentSection";
+export type { CommentSectionProps } from "./CommentSection";
 
 export { ShareModal } from "./ShareModal";
 export type { ShareModalProps } from "./ShareModal";

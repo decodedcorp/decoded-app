@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, Bookmark, Share2, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +34,12 @@ export function SocialActions({
   const [liked, setLiked] = useState(initialLiked);
   const [saved, setSaved] = useState(initialSaved);
   const [count, setCount] = useState(likeCount);
+
+  useEffect(() => {
+    setLiked(initialLiked);
+    setSaved(initialSaved);
+    setCount(likeCount);
+  }, [initialLiked, initialSaved, likeCount]);
 
   const handleLike = () => {
     const next = !liked;

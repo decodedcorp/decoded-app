@@ -1,8 +1,9 @@
 "use client";
 
-import { RefObject, useMemo, useState } from "react";
+import { RefObject, useCallback, useMemo, useRef, useState } from "react";
 import type { ImageDetail } from "@/lib/supabase/queries/images";
 import type { ImageDetailWithPostOwner } from "@/lib/api/adapters/postDetailToImageDetail";
+import type { PostMagazineLayout, RelatedEditorialItem } from "@/lib/api/types";
 import type { Json } from "@/lib/supabase/types";
 import { normalizeItem, solutionToShopItem } from "./types";
 import type { UiItem } from "./types";
@@ -15,17 +16,28 @@ import { ImageCommentSection } from "./ImageCommentSection";
 import { AddSolutionSheet } from "./AddSolutionSheet";
 import { AISummarySection } from "./AISummarySection";
 import { useAllSolutionsForSpots } from "@/lib/hooks/useSolutions";
+import { useCommentCount } from "@/lib/hooks/useComments";
+import { usePostLike } from "@/lib/hooks/usePostLike";
+import { useSavedPost } from "@/lib/hooks/useSavedPost";
+import Image from "next/image";
+import {
+  MagazineEditorialSection,
+  MagazineCelebSection,
+  MagazineItemsSection,
+  MagazineRelatedSection,
+} from "./magazine";
+import { MagazineTitleSection } from "./magazine/MagazineTitleSection";
+import { SpotDot } from "./SpotDot";
 
 type Props = {
-  image: ImageDetail;
+  image: ImageDetail & { ai_summary?: string | null };
+  magazineLayout?: PostMagazineLayout | null;
+  relatedEditorials?: RelatedEditorialItem[];
   isModal?: boolean;
   scrollContainerRef?: RefObject<HTMLElement>;
-  // Controlled active index state (optional, for lifting state up)
   activeIndex?: number | null;
   onActiveIndexChange?: (index: number | null) => void;
-  // If true, hides the hero/interactive image (useful for modal split layout where image is external)
   hideImage?: boolean;
-  // Callback when hero image is clicked (for opening lightbox)
   onHeroClick?: () => void;
 };
 
@@ -40,6 +52,8 @@ type Props = {
  */
 export function ImageDetailContent({
   image,
+  magazineLayout,
+  relatedEditorials,
   isModal = false,
   scrollContainerRef,
   activeIndex,
@@ -47,6 +61,72 @@ export function ImageDetailContent({
   hideImage = false,
   onHeroClick,
 }: Props) {
+  const hasMagazine = !!magazineLayout;
+  const accentColor = magazineLayout?.design_spec?.accent_color;
+  const commentSectionRef = useRef<HTMLDivElement>(null);
+
+  const handleShare = useCallback(async () => {
+    const url =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/posts/${image.id}`
+        : "";
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "Post", url });
+        return;
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") console.error(err);
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  }, [image.id]);
+
+  const scrollToComments = useCallback(() => {
+    commentSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  const imageWithOwner = image as ImageDetailWithPostOwner;
+  const likeCount = imageWithOwner.like_count ?? 0;
+  const initialLiked = imageWithOwner.user_has_liked ?? false;
+  const initialSaved = imageWithOwner.user_has_saved ?? false;
+
+  const { like, unlike } = usePostLike(image.id);
+  const { save, unsave } = useSavedPost(image.id);
+
+  const handleLike = useCallback(
+    async (nextLiked: boolean) => {
+      try {
+        if (nextLiked) {
+          await like();
+        } else {
+          await unlike();
+        }
+      } catch (err) {
+        console.error("Like error:", err);
+      }
+    },
+    [like, unlike]
+  );
+
+  const handleSave = useCallback(
+    async (nextSaved: boolean) => {
+      try {
+        if (nextSaved) {
+          await save();
+        } else {
+          await unsave();
+        }
+      } catch (err) {
+        console.error("Save error:", err);
+      }
+    },
+    [save, unsave]
+  );
+
   // Items are now pre-fetched via post.item_ids (if post_image exists)
   // Fallback to item.image_id if no post_image found
   const items = image.items || [];
@@ -55,20 +135,7 @@ export function ImageDetailContent({
   const itemsFromPost = image.postImages && image.postImages.length > 0;
 
   const firstPost = image.postImages?.[0]?.post || image.posts?.[0];
-  const metadata = firstPost?.metadata;
-
-  // Extract Anchor from metadata
-  const anchor = useMemo(() => {
-    if (!metadata) return null;
-    const anchorTag = metadata.find(
-      (tag) =>
-        tag.toLowerCase().startsWith("anchor:") ||
-        tag.toLowerCase().startsWith("summary:")
-    );
-    if (!anchorTag) return null;
-    // Remove "Anchor:" or "Summary:" prefix and trim
-    return anchorTag.replace(/^(anchor|summary):\s*/i, "").trim();
-  }, [metadata]);
+  const aiSummary = image.ai_summary ?? null;
 
   // Normalize items with coordinates
   // Use item_locations from the first post_image if available to override item centers
@@ -156,8 +223,14 @@ export function ImageDetailContent({
     null
   );
 
+  const commentCount = useCommentCount(image.id);
+
+  const magazineCssVars = accentColor
+    ? ({ "--magazine-accent": accentColor } as React.CSSProperties)
+    : undefined;
+
   return (
-    <div className="detail-content relative">
+    <div className="detail-content relative" style={magazineCssVars}>
       {/* Decorative Vertical Typography - Shown on desktop (Full Page & Modal) */}
       <div className="absolute left-4 top-1/2 -translate-y-1/2 hidden lg:block pointer-events-none select-none">
         <span className="font-serif text-[10px] uppercase tracking-[1em] text-primary/5 writing-mode-vertical-rl rotate-180 opacity-50">
@@ -165,35 +238,79 @@ export function ImageDetailContent({
         </span>
       </div>
 
-      {/* Section 1: Hero - Hidden if hideImage is true */}
-      {!hideImage && (
-        <HeroSection image={image} isModal={isModal} onClick={onHeroClick} />
+      {/* Section 1: Magazine Title (text header) or Hero Image */}
+      {hasMagazine ? (
+        <MagazineTitleSection
+          title={magazineLayout.title}
+          subtitle={magazineLayout.subtitle}
+        />
+      ) : (
+        !hideImage && (
+          <HeroSection image={image} isModal={isModal} onClick={onHeroClick} />
+        )
       )}
 
-      {/* AI Summary Section */}
-      <section
-        className={`mx-auto px-6 ${isModal ? "max-w-5xl pt-10 pb-8" : "max-w-6xl pt-20 pb-16"}`}
-      >
-        <div className="w-full">
-          <AISummarySection summary={anchor} isModal={isModal} />
-        </div>
-      </section>
+      {/* AI Summary Section — only rendered when summary exists */}
+      {aiSummary && (
+        <section
+          className={`mx-auto px-6 ${isModal ? "max-w-5xl pt-10 pb-8" : hasMagazine ? "max-w-6xl pt-4 pb-8" : "max-w-6xl pt-20 pb-16"}`}
+        >
+          <div className="w-full">
+            <AISummarySection summary={aiSummary} isModal={isModal} />
+          </div>
+        </section>
+      )}
 
-      {/* Section 2: Interactive Showcase (only if items with coordinates exist) */}
-      {hasItemsWithCoordinates && (
-        <InteractiveShowcase
-          image={image}
-          items={normalizedItems}
-          isModal={isModal}
-          scrollContainerRef={scrollContainerRef}
-          activeIndex={activeIndex}
-          onActiveIndexChange={onActiveIndexChange}
-          renderImage={!hideImage}
-          onAddSolution={(spotId) => setSpotIdToAddSolution(spotId)}
-          postOwnerId={
-            (image as ImageDetailWithPostOwner).post_owner_id ?? null
-          }
-        />
+      {/* Section 2: Interactive Showcase (non-magazine) or static post image with spot dots (magazine) */}
+      {hasMagazine ? (
+        image.image_url && (
+          <section className="mx-auto max-w-sm px-4 py-8 md:px-8 md:py-12">
+            <div className="relative overflow-hidden rounded-xl">
+              <Image
+                src={image.image_url}
+                alt="Post image"
+                width={384}
+                height={0}
+                className="h-auto w-full"
+                sizes="(max-width: 768px) 80vw, 384px"
+                priority
+              />
+              {/* Spot overlay dots */}
+              {normalizedItems.map((item) => {
+                if (!item.normalizedCenter) return null;
+                const meta = item.metadata as unknown as Record<string, unknown> | undefined;
+                return (
+                  <SpotDot
+                    key={item.id}
+                    mode="percent"
+                    x={item.normalizedCenter.x}
+                    y={item.normalizedCenter.y}
+                    label={item.product_name ?? ""}
+                    brand={meta?.brand as string | undefined}
+                    category={meta?.sub_category as string | undefined}
+                    accentColor={accentColor}
+                  />
+                );
+              })}
+            </div>
+          </section>
+        )
+      ) : (
+        hasItemsWithCoordinates && (
+          <InteractiveShowcase
+            image={image}
+            items={normalizedItems}
+            isModal={isModal}
+            scrollContainerRef={scrollContainerRef}
+            activeIndex={activeIndex}
+            onActiveIndexChange={onActiveIndexChange}
+            renderImage={!hideImage}
+            onAddSolution={(spotId) => setSpotIdToAddSolution(spotId)}
+            postOwnerId={
+              (image as ImageDetailWithPostOwner).post_owner_id ?? null
+            }
+          />
+        )
       )}
 
       {/* Add Solution Sheet - for items without product info */}
@@ -204,49 +321,86 @@ export function ImageDetailContent({
         onClose={() => setSpotIdToAddSolution(null)}
       />
 
-      {/* Section 3: Shop Grid (show if any items exist, even without coordinates) */}
-      {hasItems && (
-        <div>
-          {itemsFromPost && image.postImages && image.postImages.length > 0 && (
-            <div className="mx-auto max-w-6xl px-4 py-3 md:px-8">
-              <p className="text-sm text-muted-foreground">
-                Items from post: @{image.postImages[0].post.account}
-              </p>
+      {hasMagazine ? (
+        <>
+          {/* Magazine: Editorial Section */}
+          <MagazineEditorialSection
+            editorial={magazineLayout.editorial}
+            accentColor={accentColor}
+          />
+
+          {/* Magazine: Celebrity Style Archive */}
+          <MagazineCelebSection
+            celebs={magazineLayout.celeb_list}
+            accentColor={accentColor}
+          />
+
+          {/* Magazine: The Look + per-item Related Items */}
+          <MagazineItemsSection
+            items={magazineLayout.items}
+            relatedItems={magazineLayout.related_items}
+            accentColor={accentColor}
+          />
+        </>
+      ) : (
+        <>
+          {/* Shop Grid (show if any items exist, even without coordinates) */}
+          {hasItems && (
+            <div>
+              {itemsFromPost && image.postImages && image.postImages.length > 0 && (
+                <div className="mx-auto max-w-6xl px-4 py-3 md:px-8">
+                  <p className="text-sm text-muted-foreground">
+                    Items from post: @{image.postImages[0].post.account}
+                  </p>
+                </div>
+              )}
+              <ShopGrid
+                items={solutionsLoading ? normalizedItems : shopItems}
+                isModal={isModal}
+                postId={image.id}
+                onAddSolutionClick={(spotId) => setSpotIdToAddSolution(spotId)}
+              />
             </div>
           )}
-          <ShopGrid
-            items={solutionsLoading ? normalizedItems : shopItems}
-            isModal={isModal}
-            postId={image.id}
-            onAddSolutionClick={(spotId) => setSpotIdToAddSolution(spotId)}
-          />
-        </div>
+        </>
       )}
 
-      {/* Related Images Section - Always show if account is available */}
+      {/* Related Posts - 같은 유저가 올린 다른 포스트 */}
       {image.postImages?.[0]?.post?.account && (
         <RelatedImages
           currentPostId={image.id}
           account={image.postImages[0].post.account}
+          userId={(image as ImageDetailWithPostOwner).post_owner_id ?? undefined}
           isModal={isModal}
         />
       )}
 
-      {/* ============================================================ */}
-      {/* Social Actions & Comments                                     */}
-      {/* ============================================================ */}
+      {/* Social Actions & Comments */}
       <div className="px-6 py-6 md:px-10 border-t border-border">
         <SocialActions
-          likeCount={42}
-          commentCount={3}
+          initialLiked={initialLiked}
+          initialSaved={initialSaved}
+          likeCount={likeCount}
+          commentCount={commentCount}
           showComment
           variant="default"
+          onLike={handleLike}
+          onSave={handleSave}
+          onShare={handleShare}
+          onComment={scrollToComments}
         />
       </div>
-      <ImageCommentSection imageId={image.id} />
+      <div ref={commentSectionRef}>
+        <ImageCommentSection imageId={image.id} />
+      </div>
+
+      {/* Magazine: Related Editorials - 맨 마지막 */}
+      {hasMagazine && relatedEditorials && relatedEditorials.length > 0 && (
+        <MagazineRelatedSection relatedEditorials={relatedEditorials} />
+      )}
 
       {/* Fallback: Show basic info if no items */}
-      {!hasItems && (
+      {!hasItems && !hasMagazine && (
         <div className="mx-auto max-w-4xl px-4 py-16 md:px-8">
           <div className="mb-8">
             <div className="mb-4 flex flex-wrap gap-2">

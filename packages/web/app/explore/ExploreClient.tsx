@@ -17,6 +17,8 @@ import { LoadingSpinner } from "@/lib/design-system";
 
 type Props = {
   initialPosts?: PostGridItem[];
+  /** magazine_id가 있는 post만 표시 (Editorial 탭용) */
+  hasMagazine?: boolean;
 };
 
 /**
@@ -26,7 +28,7 @@ type Props = {
  * - GET /api/v1/posts with pagination
  * - Supports category filtering via API params
  */
-export function ExploreClient({ initialPosts: _initialPosts }: Props) {
+export function ExploreClient({ initialPosts: _initialPosts, hasMagazine }: Props) {
   const activeFilter = useFilterStore((state) => state.activeFilter);
   const debouncedQuery = useSearchStore((state) => state.debouncedQuery);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
@@ -62,6 +64,7 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
   } = useInfinitePosts({
     limit: 40,
     category: activeFilter,
+    hasMagazine: hasMagazine ?? false,
     // Note: search is not directly supported by Posts API
     // If needed, we can add artist_name or group_name filter
   });
@@ -82,8 +85,9 @@ export function ExploreClient({ initialPosts: _initialPosts }: Props) {
         postSource: item.postSource,
         postAccount: item.postAccount,
         postCreatedAt: item.postCreatedAt,
+        ...(hasMagazine && item.title && { editorialTitle: item.title }),
       }));
-  }, [items]);
+  }, [items, hasMagazine]);
 
   // Render full-screen ThiingsGrid with filter bar
   return (

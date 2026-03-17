@@ -1,6 +1,6 @@
 "use client";
 
-import { usePostDetailForImage } from "@/lib/hooks/useImages";
+import { usePostDetailForImage, usePostMagazine } from "@/lib/hooks/useImages";
 import { ImageDetailContent } from "./ImageDetailContent";
 import { LenisProvider } from "./LenisProvider";
 import { useEffect, useRef, useState } from "react";
@@ -10,6 +10,7 @@ import { X, Share2, Heart, Bookmark } from "lucide-react";
 import { ReportErrorButton } from "./ReportErrorButton";
 import { Lightbox } from "./Lightbox";
 import { ErrorState } from "@/lib/components/shared";
+import type { ImageDetailWithPostOwner } from "@/lib/api/adapters/postDetailToImageDetail";
 
 type Props = {
   imageId: string;
@@ -23,6 +24,8 @@ type Props = {
 export function ImageDetailPage({ imageId }: Props) {
   const router = useRouter();
   const { data: image, isLoading, error } = usePostDetailForImage(imageId);
+  const magazineId = (image as ImageDetailWithPostOwner)?.post_magazine_id;
+  const { data: magazine, isLoading: magazineLoading } = usePostMagazine(magazineId);
   const pageRef = useRef<HTMLDivElement>(null);
   const [showLightbox, setShowLightbox] = useState(false);
 
@@ -73,7 +76,9 @@ export function ImageDetailPage({ imageId }: Props) {
     }
   };
 
-  if (isLoading) {
+  const showMagazine = !!magazineId && !!magazine?.layout_json && magazine.status === "published";
+
+  if (isLoading || (magazineId && magazineLoading)) {
     return (
       <div
         className="flex min-h-screen items-center justify-center"
@@ -106,7 +111,7 @@ export function ImageDetailPage({ imageId }: Props) {
     <LenisProvider>
       <div ref={pageRef} className="relative">
         {/* Action Buttons */}
-        <div className="fixed right-4 top-4 z-50 flex gap-2">
+        <div className="fixed right-4 top-16 md:top-20 z-50 flex gap-2">
           <button
             className="flex h-10 w-10 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-transform transition-colors hover:scale-105 hover:bg-background/90"
             aria-label="Like"
@@ -136,7 +141,11 @@ export function ImageDetailPage({ imageId }: Props) {
           </button>
         </div>
 
-        <ImageDetailContent image={image} />
+        <ImageDetailContent
+          image={image}
+          magazineLayout={showMagazine ? magazine!.layout_json : null}
+          relatedEditorials={magazine?.related_editorials ?? []}
+        />
 
         {/* Lightbox */}
         <Lightbox

@@ -17,7 +17,7 @@ import {
   fetchUnifiedImages,
   fetchRelatedImagesByAccount,
 } from "@decoded/shared/supabase/queries/images";
-import { fetchPostDetail } from "@/lib/api/posts";
+import { fetchPosts, fetchPostDetail, fetchPostMagazine } from "@/lib/api/posts";
 import { postDetailToImageDetail } from "@/lib/api/adapters/postDetailToImageDetail";
 import type {
   CategoryFilter,
@@ -26,9 +26,7 @@ import type {
   ImageDetail,
   ImageRow,
 } from "@decoded/shared/supabase/queries/images";
-import { fetchPosts, fetchPostDetail } from "@/lib/api/posts";
-import { postDetailToImageDetail } from "@/lib/api/adapters/postDetailToImageDetail";
-import type { Post, PostsListParams } from "@/lib/api/types";
+import type { Post, PostsListParams, PostMagazineResponse } from "@/lib/api/types";
 
 /**
  * @deprecated Use useInfiniteFilteredImages with unified adapter instead.
@@ -37,21 +35,6 @@ export function useLatestImages(limit = 20) {
   return useQuery<ImageRow[]>({
     queryKey: ["images", "latest", limit],
     queryFn: () => fetchLatestImages(limit),
-  });
-}
-
-/**
- * React Query hook for fetching post detail via 백엔드 API
- * Explore/Feed는 post ID를 /posts/[id]로 전달하므로 API 사용
- */
-export function usePostDetailForImage(postId: string) {
-  return useQuery<ImageDetail | null>({
-    queryKey: ["posts", "detail", "image-view", postId],
-    queryFn: async () => {
-      const post = await fetchPostDetail(postId);
-      return postDetailToImageDetail(post, postId);
-    },
-    enabled: !!postId,
   });
 }
 
@@ -153,6 +136,8 @@ export type PostGridItem = {
   postCreatedAt: string;
   spotCount: number;
   viewCount: number;
+  /** 에디토리얼 그리드 오버레이용 (post.title 또는 post_magazine_title) */
+  title?: string | null;
 };
 
 /**
@@ -175,6 +160,7 @@ export function useInfinitePosts(params: {
   artistName?: string;
   groupName?: string;
   sort?: "recent" | "popular" | "trending";
+  hasMagazine?: boolean;
 }) {
   const {
     limit = 40,
@@ -183,13 +169,14 @@ export function useInfinitePosts(params: {
     artistName,
     groupName,
     sort = "recent",
+    hasMagazine,
   } = params;
 
   return useInfiniteQuery<PostsPage>({
     queryKey: [
       "posts",
       "infinite",
-      { category, search, artistName, groupName, sort, limit },
+      { category, search, artistName, groupName, sort, limit, hasMagazine },
     ],
     queryFn: async ({ pageParam }) => {
       const apiParams: PostsListParams = {
@@ -207,6 +194,9 @@ export function useInfinitePosts(params: {
       if (groupName) {
         apiParams.group_name = groupName;
       }
+      if (hasMagazine === true) {
+        apiParams.has_magazine = true;
+      }
 
       const response = await fetchPosts(apiParams);
 
@@ -220,6 +210,9 @@ export function useInfinitePosts(params: {
         postCreatedAt: post.created_at,
         spotCount: post.spot_count,
         viewCount: post.view_count,
+        // editorial 오버레이: 매거진 타이틀 우선, 없으면 post.title
+        title:
+          post.post_magazine_title ?? post.title ?? null,
       }));
 
       const { pagination } = response;
@@ -248,6 +241,23 @@ export function usePostDetailForImage(postId: string) {
     enabled: !!postId,
     staleTime: 1000 * 60,
     gcTime: 1000 * 60 * 5,
+  });
+}
+
+// ============================================================
+// Post Magazine hooks
+// ============================================================
+
+export function usePostMagazine(magazineId: string | null | undefined) {
+  return useQuery<PostMagazineResponse | null>({
+    queryKey: ["post-magazines", magazineId],
+    queryFn: async () => {
+      if (!magazineId) return null;
+      return fetchPostMagazine(magazineId);
+    },
+    enabled: !!magazineId,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 }
 

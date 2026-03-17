@@ -28,10 +28,18 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
   const { postId } = await params;
 
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  const authHeader = request.headers.get("Authorization");
+  if (authHeader) {
+    headers["Authorization"] = authHeader;
+  }
+
   try {
     const response = await fetch(`${API_BASE_URL}/api/v1/posts/${postId}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers,
     });
 
     const data = await response.json();
