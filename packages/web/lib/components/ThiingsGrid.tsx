@@ -105,6 +105,8 @@ export type GridItem = {
   postSource: PostSource; // Discriminator: "post" | "legacy"
   postAccount: string; // Account name for badge display (e.g., "newjeanscloset", "Legacy")
   postCreatedAt: string; // Post timestamp for context/sorting
+  /** 에디토리얼 그리드 카드 오버레이 표시용 */
+  editorialTitle?: string | null;
 };
 
 type GridItemInternal = {

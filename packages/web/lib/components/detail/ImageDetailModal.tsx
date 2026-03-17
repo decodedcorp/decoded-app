@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import { X, Maximize2 } from "lucide-react";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
-import { usePostDetailForImage } from "@/lib/hooks/useImages";
-import { ImageDetailContent } from "./ImageDetailContent";
+import { usePostDetailForImage, usePostMagazine } from "@/lib/hooks/useImages";
+import { ImageDetailPreview } from "./ImageDetailPreview";
+import { SpotDot } from "./SpotDot";
 import { useTransitionStore } from "@/lib/stores/transitionStore";
 import { ReportErrorButton } from "./ReportErrorButton";
+import type { ImageDetailWithPostOwner } from "@/lib/api/adapters/postDetailToImageDetail";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(Flip);
@@ -26,6 +28,8 @@ type Props = {
 export function ImageDetailModal({ imageId }: Props) {
   const router = useRouter();
   const { data: image, isLoading, error } = usePostDetailForImage(imageId);
+  const magazineId = (image as ImageDetailWithPostOwner)?.post_magazine_id;
+  const { data: magazine } = usePostMagazine(magazineId);
   const { originRect, reset, imgSrc } = useTransitionStore();
 
   // Debug: Log imageId and data state (development only)
@@ -432,11 +436,36 @@ export function ImageDetailModal({ imageId }: Props) {
       );
     }
 
+    const publishedMagazineLayout =
+      magazineId && magazine?.layout_json && magazine.status === "published"
+        ? magazine.layout_json
+        : null;
+
+    const magazineTitle = publishedMagazineLayout?.title ?? null;
+
+    const brands =
+      publishedMagazineLayout?.items
+        ?.map((item) => item.brand)
+        .filter((b): b is string => !!b && b.trim() !== "") ?? [];
+    const uniqueBrands = [...new Set(brands)];
+
+    const styleTags =
+      (publishedMagazineLayout?.design_spec as { style_tags?: string[] })
+        ?.style_tags ?? [];
+
+    const img = image as ImageDetailWithPostOwner;
+    const artistTags = [img?.artist_name, img?.group_name]
+      .filter((v): v is string => !!v && v.trim() !== "")
+      .filter((v, i, arr) => arr.indexOf(v) === i); // dedupe
+
     return (
-      <ImageDetailContent
+      <ImageDetailPreview
         image={image}
-        isModal={true}
-        scrollContainerRef={scrollContainerRef as React.RefObject<HTMLElement>}
+        magazineTitle={magazineTitle}
+        artistTags={artistTags}
+        brands={uniqueBrands}
+        styleTags={styleTags}
+        onViewFull={handleMaximize}
       />
     );
   };
@@ -573,13 +602,24 @@ export function ImageDetailModal({ imageId }: Props) {
       {activeImageSrc && (
         <div
           ref={leftImageContainerRef}
-          className="hidden md:block fixed z-60 shadow-2xl bg-black rounded-lg overflow-hidden"
+          className="hidden md:block fixed z-60 shadow-2xl rounded-lg overflow-hidden"
           style={{
             opacity: 0, // Initially hidden, set by GSAP
             // Initial positioning will be handled by GSAP based on originRect
           }}
           onWheel={handleImageScroll} // Forward scroll events
         >
+          {/* Blurred post image as background (letterbox fill) */}
+          <div
+            className="absolute inset-0 -z-10"
+            style={{
+              backgroundImage: `url(${activeImageSrc})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              filter: "blur(24px)",
+              transform: "scale(1.08)",
+            }}
+          />
           <img
             ref={floatingImageRef}
             src={activeImageSrc}
@@ -594,10 +634,11 @@ export function ImageDetailModal({ imageId }: Props) {
             }}
           />
 
-          {/* Spot Markers on Floating Image (matching StyleCard white dot style) */}
+          {/* Spot Markers on Floating Image - with hover tooltip (brand, label, category) */}
           {image?.items && image.items.length > 0 && (() => {
             const imageRect = getContainedImageRect();
             if (!imageRect) return null;
+            const accentColor = (magazine?.layout_json as { design_spec?: { accent_color?: string } })?.design_spec?.accent_color;
 
             return (
               <div className="absolute inset-0 pointer-events-none z-20">
@@ -608,20 +649,21 @@ export function ImageDetailModal({ imageId }: Props) {
                   const fracY = typeof center[1] === "number" ? center[1] : parseFloat(String(center[1])) || 0;
                   const pixelLeft = imageRect.left + imageRect.width * (fracX > 1 ? fracX / 100 : fracX);
                   const pixelTop = imageRect.top + imageRect.height * (fracY > 1 ? fracY / 100 : fracY);
+                  const meta = item.metadata as unknown as Record<string, unknown> | undefined;
+                  const brand = meta?.brand as string | undefined;
+                  const category = meta?.sub_category as string | undefined;
 
                   return (
-                    <div
-                      key={item.spot_id ?? idx}
-                      className="absolute w-8 h-8 flex items-center justify-center"
-                      style={{
-                        left: `${pixelLeft}px`,
-                        top: `${pixelTop}px`,
-                        transform: "translate(-50%, -50%)",
-                      }}
-                    >
-                      <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-30 duration-[2000ms]" />
-                      <div className="relative w-3 h-3 bg-primary rounded-full shadow-[0_0_25px_oklch(0.9519_0.1739_115.8446)] border border-black/20" />
-                    </div>
+                    <SpotDot
+                      key={item.id ?? idx}
+                      mode="pixel"
+                      leftPx={pixelLeft}
+                      topPx={pixelTop}
+                      label={item.product_name ?? ""}
+                      brand={brand}
+                      category={category}
+                      accentColor={accentColor}
+                    />
                   );
                 })}
               </div>

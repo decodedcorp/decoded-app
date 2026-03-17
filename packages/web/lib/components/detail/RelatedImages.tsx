@@ -7,7 +7,7 @@ import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 
 // Register GSAP ScrollTrigger plugin
 if (typeof window !== "undefined") {
@@ -17,17 +17,22 @@ if (typeof window !== "undefined") {
 type Props = {
   currentPostId: string;
   account: string;
+  /** 같은 유저의 다른 포스트 조회용. 있으면 user_id로 필터, 없으면 artist_name(account) 시도 */
+  userId?: string | null;
   isModal?: boolean;
 };
 
 export function RelatedImages({
   currentPostId,
   account,
+  userId,
   isModal = false,
 }: Props) {
   const { data: postsData, isLoading } = useInfinitePosts({
     perPage: 12,
-    artistName: account,
+    // 같은 계정(유저)의 포스트 = user_id로 필터. artist_name은 셀럽명이라 account와 다름
+    userId: userId ?? undefined,
+    ...(userId ? {} : { artistName: account }),
   });
 
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -164,10 +169,18 @@ export function RelatedImages({
                   </div>
                 )}
 
-                {/* Overlay with account name on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="absolute bottom-3 left-3 text-white text-sm font-medium">
-                    @{account}
+                {/* Magazine-style overlay: artist_name의 N개의 아이템 둘러보기 + Read CTA */}
+                <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="p-4 space-y-3">
+                    <p className="text-white/90 text-sm">
+                      {post.artist_name
+                        ? `${post.artist_name}의 아이템 둘러보기`
+                        : "아이템 둘러보기"}
+                    </p>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-widest text-white/90 group-hover:text-white transition-colors border-b border-white/40 group-hover:border-white pb-0.5 w-fit">
+                      Read
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
                   </div>
                 </div>
               </CardWrapper>

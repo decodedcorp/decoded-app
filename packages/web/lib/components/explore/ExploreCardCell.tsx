@@ -89,6 +89,27 @@ export const ExploreCardCell = memo(function ExploreCardCell({
             onError={() => setImageError(true)}
             onLoad={() => setIsLoaded(true)}
           />
+          {/* Editorial 타이틀 오버레이 - 검은 스킴 + 텍스트 아웃라인으로 어떤 배경에서도 선명하게 */}
+          {item?.editorialTitle && (
+            <div className="absolute inset-x-0 bottom-0">
+              {/* 하단 검은색 오버레이: 타이틀 영역 확실히 어둡게 */}
+              <div
+                className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/95 via-black/80 to-transparent"
+                aria-hidden
+              />
+              <div className="absolute inset-x-0 bottom-0 px-3.5 pb-3 pt-6">
+                <p
+                  className="line-clamp-2 text-[13px] font-semibold leading-[1.35] tracking-tight text-white antialiased"
+                  style={{
+                    textShadow:
+                      "0 0 2px rgba(0,0,0,1), 0 0 4px rgba(0,0,0,0.9), 0 1px 2px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)",
+                  }}
+                >
+                  {item.editorialTitle}
+                </p>
+              </div>
+            </div>
+          )}
         </article>
       </Card>
     </Link>

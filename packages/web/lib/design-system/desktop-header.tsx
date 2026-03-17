@@ -54,6 +54,7 @@ export interface DesktopHeaderProps
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
   { href: "/explore", label: "Explore" },
+  { href: "/editorial", label: "Editorial" },
   { href: "/request/upload", label: "Upload", isUpload: true },
 ] as const;
 

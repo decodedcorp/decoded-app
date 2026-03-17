@@ -69,12 +69,14 @@ export async function apiClient<T>(options: ApiClientOptions): Promise<T> {
     requestHeaders["Content-Type"] = "application/json";
   }
 
-  // Add Authorization header if required
+  // Add Authorization header if required, or when token available (optional auth)
+  const token = await getAuthToken();
   if (requiresAuth) {
-    const token = await getAuthToken();
     if (!token) {
       throw new Error("로그인이 필요합니다.");
     }
+    requestHeaders["Authorization"] = `Bearer ${token}`;
+  } else if (token) {
     requestHeaders["Authorization"] = `Bearer ${token}`;
   }
 

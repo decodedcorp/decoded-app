@@ -49,13 +49,31 @@ export function extractKoreanPart(
 }
 
 /**
+ * Normalize input to string array for filtering.
+ * Handles: string[], Record<string, unknown>, or other falsy values
+ */
+function toTagArray(tags: string[] | Record<string, unknown> | null | undefined): string[] {
+  if (!tags) return [];
+  if (Array.isArray(tags)) return tags.filter((t): t is string => typeof t === "string");
+  if (typeof tags === "object" && tags !== null && !Array.isArray(tags)) {
+    return Object.entries(tags)
+      .filter(([, v]) => v != null && v !== "")
+      .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : String(v)}`);
+  }
+  if (typeof tags === "string") return [tags];
+  return [];
+}
+
+/**
  * Filter tags to keep only those containing Korean characters
  * Also handles multi-language strings by extracting the Korean part
+ * Accepts string[] or Record<string, unknown> (metadata object)
  */
-export function filterKoreanTags(tags: string[] | null | undefined): string[] {
-  if (!tags) return [];
+export function filterKoreanTags(tags: string[] | Record<string, unknown> | null | undefined): string[] {
+  const arr = toTagArray(tags);
+  if (arr.length === 0) return [];
 
-  return tags
+  return arr
     .map((tag) => {
       // Use extractKoreanPart to handle both separators and pure Korean strings
       // (extractKoreanPart returns the string itself if it's Korean and has no separators,

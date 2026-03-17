@@ -194,6 +194,8 @@ export interface Post {
   image_url: string;
   media_source: PostMediaSource | null;
   title: string | null;
+  /** 에디토리얼(매거진) 타이틀. post_magazine_id가 있을 때만 반환 */
+  post_magazine_title?: string | null;
   artist_name: string | null;
   group_name: string | null;
   context: string | null;
@@ -226,6 +228,8 @@ export interface PostsListParams {
   per_page?: number;
   /** true = 솔루션 있는 post만, false = spot은 있으나 솔루션 없는 post만 */
   has_solutions?: boolean;
+  /** true = post_magazine_id가 있는 post만 (editorial) */
+  has_magazine?: boolean;
 }
 
 // ============================================================
@@ -537,6 +541,99 @@ export interface PostDetailResponse {
   user: PostUser;
   spots: SpotWithTopSolution[];
   comment_count: number;
+  /** 좋아요 개수 */
+  like_count?: number;
+  /** 현재 사용자가 좋아요 했는지 (인증 시에만) */
+  user_has_liked?: boolean | null;
+  /** 현재 사용자가 저장했는지 (인증 시에만) */
+  user_has_saved?: boolean | null;
+  /** 연결된 Post Magazine ID (매거진이 생성된 경우) */
+  post_magazine_id?: string | null;
+  /** AI가 생성한 포스트 요약 (1-2문장) */
+  ai_summary?: string | null;
+}
+
+// ============================================================
+// Post Magazine API Types
+// GET /api/v1/post-magazines/{id}
+// ============================================================
+
+export interface PostMagazineDesignSpec {
+  accent_color: string;
+  primary_color?: string;
+  secondary_color?: string;
+  bg_color?: string;
+  font_heading?: string;
+  font_body?: string;
+  style_tags?: string[];
+}
+
+export interface PostMagazineEditorialSection {
+  paragraphs: string[];
+  pull_quote: string | null;
+}
+
+export interface PostMagazineCelebWithItem {
+  celeb_name: string;
+  celeb_image_url: string | null;
+  post_id: string;
+  item_name: string;
+  item_brand: string | null;
+  relevance_score: number;
+}
+
+export interface PostMagazineSpotItem {
+  spot_id: string;
+  solution_id: string | null;
+  title: string;
+  brand: string | null;
+  image_url: string | null;
+  original_url: string | null;
+  metadata: Record<string, unknown>;
+  editorial_paragraphs: string[];
+}
+
+export interface PostMagazineRelatedItem {
+  title: string;
+  brand: string | null;
+  image_url: string | null;
+  original_url: string | null;
+  relevance_reason: string | null;
+  source: "internal" | "external";
+  for_spot_id?: string | null;
+}
+
+export interface RelatedEditorialItem {
+  post_id: string;
+  title: string;
+  image_url?: string | null;
+  bg_color?: string | null;
+}
+
+export interface PostMagazineLayout {
+  schema_version: string;
+  title: string;
+  subtitle: string | null;
+  editorial: PostMagazineEditorialSection;
+  celeb_list: PostMagazineCelebWithItem[];
+  items: PostMagazineSpotItem[];
+  related_items: PostMagazineRelatedItem[];
+  design_spec: PostMagazineDesignSpec;
+}
+
+export interface PostMagazineResponse {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  keyword: string | null;
+  layout_json: PostMagazineLayout | null;
+  status: string;
+  review_summary: string | null;
+  error_log: unknown | null;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+  related_editorials?: RelatedEditorialItem[];
 }
 
 // ============================================================

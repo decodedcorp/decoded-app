@@ -13,6 +13,19 @@ export type ImageDetailWithPostOwner = ImageDetail & {
   post_owner_id?: string | null;
   /** 포스트 생성 시 솔루션을 알고 등록했는지 */
   created_with_solutions?: boolean | null;
+  /** 연결된 Post Magazine ID */
+  post_magazine_id?: string | null;
+  /** AI가 생성한 포스트 요약 */
+  ai_summary?: string | null;
+  /** 아티스트/그룹명 (태그용) */
+  artist_name?: string | null;
+  group_name?: string | null;
+  /** 좋아요 개수 */
+  like_count?: number;
+  /** 현재 사용자가 좋아요 했는지 */
+  user_has_liked?: boolean | null;
+  /** 현재 사용자가 저장했는지 */
+  user_has_saved?: boolean | null;
 };
 
 function parsePosition(val: string): number {
@@ -60,7 +73,7 @@ export function postDetailToImageDetail(
         scores: null,
         ambiguity: null,
         citations,
-        metadata: null,
+        metadata: (top?.metadata as any) ?? null,
         sam_prompt: null,
       };
     }
@@ -71,7 +84,14 @@ export function postDetailToImageDetail(
     image_hash: "",
     image_url: post.image_url,
     post_owner_id: post.user?.id ?? null,
+    like_count: post.like_count ?? 0,
+    user_has_liked: post.user_has_liked ?? false,
+    user_has_saved: post.user_has_saved ?? false,
     created_with_solutions: post.created_with_solutions ?? null,
+    post_magazine_id: post.post_magazine_id ?? null,
+    ai_summary: post.ai_summary ?? null,
+    artist_name: post.artist_name ?? null,
+    group_name: post.group_name ?? null,
     status: post.status as
       | "pending"
       | "extracted"

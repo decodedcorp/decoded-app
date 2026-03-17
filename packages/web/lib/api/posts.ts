@@ -20,6 +20,7 @@ import {
   UpdatePostDto,
   PostResponse,
   PostDetailResponse,
+  PostMagazineResponse,
   ApiError,
 } from "./types";
 
@@ -404,6 +405,8 @@ function buildPostsQueryString(params?: PostsListParams): string {
     searchParams.set("per_page", String(params.per_page));
   if (params.has_solutions !== undefined)
     searchParams.set("has_solutions", String(params.has_solutions));
+  if (params.has_magazine !== undefined)
+    searchParams.set("has_magazine", String(params.has_magazine));
 
   const queryString = searchParams.toString();
   return queryString ? `?${queryString}` : "";
@@ -432,8 +435,9 @@ export async function fetchPostsServer(
   params?: PostsListParams
 ): Promise<PostsListResponse> {
   const queryString = buildPostsQueryString(params);
+  const serverApiBase = process.env.API_BASE_URL || API_BASE_URL;
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/posts${queryString}`, {
+  const response = await fetch(`${serverApiBase}/api/v1/posts${queryString}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -468,6 +472,21 @@ export async function fetchPostDetail(
 ): Promise<PostDetailResponse> {
   return apiClient<PostDetailResponse>({
     path: `/api/v1/posts/${postId}`,
+    method: "GET",
+    requiresAuth: false,
+  });
+}
+
+// ============================================================
+// Fetch Post Magazine
+// GET /api/v1/post-magazines/{magazineId}
+// ============================================================
+
+export async function fetchPostMagazine(
+  magazineId: string
+): Promise<PostMagazineResponse> {
+  return apiClient<PostMagazineResponse>({
+    path: `/api/v1/post-magazines/${magazineId}`,
     method: "GET",
     requiresAuth: false,
   });
